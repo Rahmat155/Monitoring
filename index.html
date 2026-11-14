@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<title>RAZH — Form Monitoring Paket</title>
+<style>
+:root{--red:#2563eb;--ink:#171717;--muted:#747474;--line:#e7e7e7;--bg:#f5f5f5;--green:#187747}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+header{background:linear-gradient(125deg,#111,#303030);color:#fff;padding:27px 18px 55px}.head,main{max-width:680px;margin:auto}.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:.4px}.logo{width:35px;height:35px;border-radius:10px;background:var(--red);display:grid;place-items:center;font-size:20px;font-weight:900}
+h1{font-size:clamp(25px,5vw,34px);line-height:1.15;margin:23px 0 7px}header p{font-size:14px;color:#d0d0d0;margin:0}
+main{padding:0 15px;margin-top:-29px;margin-bottom:35px}.card{background:white;border:1px solid #eee;border-radius:18px;padding:22px;box-shadow:0 8px 28px #00000008}
+.progress-wrap{margin-bottom:18px}.progress-meta{display:flex;justify-content:space-between;color:#777;font-size:12px;font-weight:700;margin-bottom:8px}.track{height:7px;background:#eee;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:var(--red);border-radius:20px;transition:width .2s}
+.kicker{font-size:11px;color:var(--red);font-weight:850;letter-spacing:1px;text-transform:uppercase}.question{font-size:23px;line-height:1.25;margin:7px 0 7px;font-weight:850}.sub{font-size:13px;color:var(--muted);margin:0 0 20px}
+label{display:block;font-size:13px;font-weight:750;margin-bottom:7px}input,select{width:100%;height:50px;border:1px solid #d9d9d9;border-radius:12px;padding:0 13px;font:inherit;font-size:15px;background:white;color:#222;outline:none}input:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px #2563eb18}
+.hint{font-size:11px;color:#858585;margin:7px 1px 0}.field{margin:0 0 16px}.hidden{display:none!important}
+.actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}.btn{border:0;border-radius:12px;min-height:49px;padding:12px 16px;font:inherit;font-weight:800;font-size:14px;cursor:pointer}.primary{background:var(--red);color:white;flex:1}.secondary{background:#f0f0f0;color:#222}.btn:disabled{opacity:.45;cursor:not-allowed}#review .actions .btn{flex:1}
+.error{display:none;color:#a00000;background:#fff0f0;border:1px solid #ffd4d4;border-radius:10px;padding:10px 12px;font-size:13px;margin-top:12px}
+.optional{border:1px dashed #ccc;border-radius:12px;padding:12px;background:#fafafa;font-size:12px;color:#666;margin-top:10px}
+.review-list{border:1px solid var(--line);border-radius:13px;overflow:hidden}.review-row{display:flex;justify-content:space-between;gap:15px;padding:11px 13px;border-bottom:1px solid var(--line);font-size:13px}.review-row:last-child{border:0}.review-row span:first-child{color:#777}.review-row strong{text-align:right;overflow-wrap:anywhere}
+.notice{background:#fff7e8;color:#755018;padding:12px;border-radius:11px;font-size:12px;margin-top:14px}
+.preview{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f7f7;border:1px solid #e8e8e8;border-radius:12px;padding:14px;font:12px/1.65 ui-monospace,monospace;margin-top:15px}
+footer{text-align:center;color:#888;font-size:11px;padding:0 20px 28px}
+
+ 
+.reminder-item{border:1px solid #e8e8e8;border-radius:13px;padding:13px;background:#fff}
+.reminder-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.reminder-head strong{font-size:13px;overflow-wrap:anywhere}
+.reminder-date{font-size:11px;color:#777;margin-top:4px}
+.reminder-status{display:inline-block;border-radius:20px;padding:5px 9px;font-size:11px;font-weight:800;background:#f1f1f1;color:#555;margin-top:9px}
+.reminder-status.soon{background:#fff4dc;color:#865400}
+.reminder-status.today{background:#ffe8e8;color:#b00020}
+.reminder-status.expired{background:#eee;color:#666}
+.reminder-actions{display:flex;gap:8px;margin-top:10px}
+.reminder-actions button{min-height:38px;padding:8px 12px;font-size:12px}
+.reminder-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.reminder-actions button{min-height:43px;padding:9px 10px;font-size:12px;border-radius:11px}
+.reminder-actions .reminder-detail-toggle{grid-column:1/-1;background:#f1f5fb;color:#28456f;border:1px solid #e0e8f3}
+.reminder-detail-panel{margin-top:10px;padding:12px;border:1px solid #e5ebf4;border-radius:12px;background:#f8faff}
+.reminder-detail-title{font-size:11px;font-weight:850;letter-spacing:.5px;color:#64748b;margin-bottom:9px}
+.reminder-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.reminder-detail-cell{min-width:0}
+.reminder-detail-cell span{display:block;color:#8490a1;font-size:10px;margin-bottom:3px}
+.reminder-detail-cell strong{display:block;color:#263449;font-size:12px;overflow-wrap:anywhere}
+.reminder-detail-order{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;padding:9px;border-radius:9px;background:#edf4ff}
+.reminder-detail-order code{font-size:11px;font-weight:800;color:#2454a6;overflow-wrap:anywhere}
+.reminder-detail-order button{flex:0 0 auto;min-height:32px;padding:6px 9px;font-size:10px;border-radius:8px}
+@media(max-width:390px){.reminder-actions{grid-template-columns:1fr}.reminder-actions .reminder-detail-toggle{grid-column:auto}.reminder-detail-grid{grid-template-columns:1fr 1fr}}
+
+#liveClock{position:sticky;top:0;z-index:50;background:#111;color:#fff;display:flex;justify-content:center;align-items:center;gap:13px;padding:9px 12px;font-size:12px;box-shadow:0 2px 10px #0002}
+#liveClock span{white-space:nowrap}#liveClock b{font-variant-numeric:tabular-nums;font-size:14px;color:#fff}
+#liveClock .clock-zone{color:#ffb8bb;font-size:10px}
+
+.history-search-wrap{position:relative;display:flex;align-items:center;margin-top:4px}
+.history-search-wrap input{height:54px;padding:0 46px 0 43px;border:1.5px solid #dce4f2;border-radius:15px;background:#f9fbff;font-size:14px}
+.history-search-wrap input:focus{background:#fff;border-color:#2563eb;box-shadow:0 0 0 4px #2563eb12}
+.history-search-icon{position:absolute;left:15px;z-index:1;color:#2563eb;font-size:25px;line-height:1;pointer-events:none}
+.history-clear{position:absolute;right:10px;width:30px;height:30px;border:0;border-radius:50%;background:#e9eef8;color:#52627b;font-size:21px;line-height:1;display:grid;place-items:center;cursor:pointer}
+.history-search-help{font-size:11px;color:#7b8493;margin:8px 2px 10px;line-height:1.55}
+.history-search-help b{color:#365a9d;font-weight:750}
+.history-results-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px}
+.history-local-tag{font-size:9px;font-weight:850;letter-spacing:.7px;color:#64748b;background:#f1f5f9;padding:5px 8px;border-radius:20px;white-space:nowrap}
+.history-item{border:1px solid #e3e8f0;border-radius:15px;padding:14px;background:linear-gradient(145deg,#fff,#fbfcff);box-shadow:0 3px 12px #0f172a08}
+.history-item-top{align-items:center}
+.history-item strong{font-size:14px;line-height:1.35}
+.history-order-id{display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:6px 9px;border-radius:8px;background:#edf4ff;color:#2454a6;font:750 11px/1.2 ui-monospace,monospace;overflow-wrap:anywhere}
+.history-meta{font-size:11px;line-height:1.55;color:#788292;margin-top:7px}
+.history-actions{gap:9px}
+.history-actions button{flex:1;min-height:42px;border-radius:11px;font-size:12px}
+@media(max-width:480px){.history-search-wrap input{height:52px}.history-actions{flex-wrap:nowrap}.history-actions button{min-width:0}}
+
+.history-item-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.history-item strong{font-size:13px;overflow-wrap:anywhere}
+.history-meta{font-size:11px;color:#777;margin-top:4px}
+.history-actions{display:flex;gap:7px;margin-top:10px}
+.history-actions button{min-height:36px;padding:7px 10px;font-size:12px}
+@media(max-width:480px){#liveClock{justify-content:space-between;gap:5px;font-size:11px;padding:8px 10px}#liveClock .clock-zone{font-size:9px}.history-actions{flex-wrap:wrap}}
+/* Efek ringan: transisi singkat, tanpa library atau animasi berat */
+.card{transition:box-shadow .18s ease,border-color .18s ease}
+.card:not(.hidden){animation:cardIn .22s ease-out both}
+@keyframes cardIn{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.btn{transition:transform .12s ease,filter .12s ease,box-shadow .12s ease}
+.btn:active{transform:scale(.985)}
+.primary:hover{filter:brightness(.96);box-shadow:0 4px 12px #2563eb25}
+.secondary:hover{background:#e8e8e8}
+.logo{box-shadow:0 4px 12px #2563eb30}
+input,select{transition:border-color .15s ease,box-shadow .15s ease}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
+@media(max-width:480px){.card{padding:18px}.question{font-size:21px}.actions{flex-direction:column-reverse}.btn{width:100%}}
+
+/* RAZH dynamic entry splash */
+#razhSplash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#101d3b 0%,#0b1020 40%,#080808 78%);color:#fff;transition:opacity .35s ease,transform .35s cubic-bezier(.2,.7,.2,1)}
+#razhSplash:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,#fff1 50%,transparent 65%);transform:translateX(-100%);animation:razhShine 2.8s ease-in-out infinite}
+#razhSplash .razh-mark{width:100px;height:112px;margin-bottom:32px;filter:drop-shadow(0 0 22px #2563eb88);animation:razhMarkIn .45s ease both}
+#razhSplash svg{width:100%;height:100%}
+#razhSplash path{stroke-dasharray:360;stroke-dashoffset:360;animation:razhDraw 1.15s cubic-bezier(.65,0,.35,1) .1s forwards,razhGlow 1.7s ease-in-out 1.3s infinite alternate}
+#razhSplash .razh-splash-brand{font-size:15px;letter-spacing:5px;font-weight:850}
+#razhSplash .razh-splash-brand span{color:#60a5fa}
+#razhSplash .razh-status{margin-top:27px;color:#b9c5dc;font-size:11px;letter-spacing:2px;text-transform:uppercase}
+#razhSplash .razh-loader{width:150px;height:3px;background:#30394b;border-radius:20px;margin-top:16px;overflow:hidden}
+#razhSplash .razh-loader i{display:block;height:100%;width:38%;background:#2563eb;border-radius:20px;animation:razhProgress 1.45s ease-in-out infinite}
+#razhSplash .razh-note{position:absolute;bottom:25px;color:#78849b;font-size:10px;letter-spacing:.5px;text-align:center;padding:0 20px}
+#razhSplash.razh-leave{opacity:0;transform:scale(1.045);filter:brightness(1.18);pointer-events:none}
+@keyframes razhDraw{to{stroke-dashoffset:0}}
+@keyframes razhGlow{from{filter:drop-shadow(0 0 3px #2563eb)}to{filter:drop-shadow(0 0 16px #2563eb)}}
+@keyframes razhProgress{0%{transform:translateX(-110%)}100%{transform:translateX(390%)}}
+@keyframes razhShine{0%,15%{transform:translateX(-100%)}65%,100%{transform:translateX(100%)}}
+@keyframes razhMarkIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){#razhSplash *,#razhSplash:before{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}#razhSplash path{stroke-dashoffset:0}}
+
+
+/* Dynamic reveal for the real RAZH page */
+body.razh-enter header{animation:razhHeaderIn .55s cubic-bezier(.2,.8,.2,1) both}
+body.razh-enter main .card,
+body.razh-enter main section.card{animation:razhCardIn .55s cubic-bezier(.2,.8,.2,1) both}
+body.razh-enter main .card:nth-of-type(1){animation-delay:.22s}
+body.razh-enter main .card:nth-of-type(2){animation-delay:.43s}
+body.razh-enter main .card:nth-of-type(3){animation-delay:.64s}
+body.razh-enter #globalBackWrap{animation:razhCardIn .4s ease both}
+@keyframes razhHeaderIn{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes razhCardIn{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+
+
+
+/* Enhanced RAZH logo-only intro: layered light, orbit and staged reveal */
+#razhSplash{background:radial-gradient(ellipse at 50% 44%,#142b52 0%,#0b1730 36%,#080d1a 76%)}
+#razhSplash:after{content:"";position:absolute;width:min(78vw,360px);aspect-ratio:1;border:1px solid #3b82f633;border-radius:50%;box-shadow:0 0 35px #2563eb18,inset 0 0 35px #2563eb12;animation:razhHalo 3.2s ease-in-out both;pointer-events:none}
+#razhSplash .razh-mark{position:relative;z-index:1;width:108px;height:122px;margin-bottom:27px;filter:drop-shadow(0 0 13px #2563eb66);animation:razhMarkIn .75s cubic-bezier(.18,.85,.25,1.2) both}
+#razhSplash .razh-mark:before{content:"";position:absolute;inset:-22px;border:1px solid #60a5fa30;border-radius:50%;animation:razhOrbit 3s linear infinite}
+#razhSplash .razh-mark:after{content:"";position:absolute;inset:-9px;border-radius:50%;background:radial-gradient(circle,#3b82f622,transparent 68%);animation:razhPulse 1.8s ease-in-out infinite}
+#razhSplash .razh-mark svg{position:relative;z-index:1}
+#razhSplash path{stroke-dasharray:360;stroke-dashoffset:360;animation:razhDraw 1.35s cubic-bezier(.65,0,.35,1) .25s forwards,razhGlow 1.7s ease-in-out 1.65s infinite alternate}
+#razhSplash .razh-splash-brand{position:relative;z-index:2;opacity:0;animation:razhBrandIn .7s ease 1.05s forwards}
+#razhSplash .razh-status{opacity:0;animation:razhBrandIn .55s ease 1.35s forwards}
+#razhSplash .razh-loader{height:4px;width:170px;margin-top:18px;background:#263a5a;box-shadow:0 0 18px #2563eb22;opacity:0;animation:razhBrandIn .4s ease 1.5s forwards}
+#razhSplash .razh-loader i{width:34%;background:linear-gradient(90deg,#2563eb,#7dd3fc);box-shadow:0 0 12px #60a5fa;animation:razhProgress 1.45s cubic-bezier(.4,0,.2,1) 1.55s both}
+#razhSplash .razh-note{opacity:0;animation:razhBrandIn .5s ease 1.7s forwards}
+@keyframes razhHalo{0%{opacity:0;transform:scale(.75)}35%{opacity:1;transform:scale(1)}75%{opacity:.7;transform:scale(1.06)}100%{opacity:.25;transform:scale(1.12)}}
+@keyframes razhOrbit{to{transform:rotate(360deg)}}
+@keyframes razhPulse{0%,100%{opacity:.35;transform:scale(.88)}50%{opacity:.9;transform:scale(1.08)}}
+@keyframes razhBrandIn{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@keyframes razhGlow{from{filter:drop-shadow(0 0 4px #2563eb)}to{filter:drop-shadow(0 0 19px #60a5fa)}}
+@keyframes razhProgress{0%{transform:translateX(-115%)}100%{transform:translateX(390%)}}
+
+
+/* Logo RAZH diperjelas: monogram solid, kontras tinggi, tanpa garis outline */
+#razhSplash .razh-mark{
+  width:112px;height:112px;margin-bottom:27px;padding:17px;
+  display:grid;place-items:center;
+  border-radius:28px;
+  background:linear-gradient(145deg,#3b82f6 0%,#1d4ed8 58%,#1e40af 100%);
+  border:1px solid #93c5fd88;
+  box-shadow:0 14px 38px #2563eb55,inset 0 1px 0 #ffffff55;
+  filter:none;
+}
+#razhSplash .razh-mark svg{width:100%;height:100%;display:block}
+#razhSplash .razh-mark path{
+  fill:#fff;stroke:none;stroke-dasharray:none;stroke-dashoffset:0;
+  animation:none;filter:drop-shadow(0 2px 2px #0b245b55);
+}
+#razhSplash .razh-mark:before{inset:-13px;border-color:#60a5fa38}
+#razhSplash .razh-mark:after{inset:-4px}
+
+
+/* Efek tambahan pilihan: partikel cahaya halus di sekitar logo */
+#razhSplash .razh-particles{
+ position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;
+}
+#razhSplash .razh-particles i{
+ position:absolute;left:var(--x);top:var(--y);
+ width:var(--s);height:var(--s);border-radius:50%;
+ background:#dbeafe;box-shadow:0 0 7px 2px #60a5fa66;
+ opacity:0;
+ animation:razhParticleDrift var(--duration,8s) ease-in-out var(--d) infinite;
+ will-change:transform,opacity;
+}
+/* Tiap partikel punya lintasan dan tempo berbeda agar geraknya alami. */
+#razhSplash .razh-particles i:nth-child(1){--dx:-13px;--dy:-27px;--duration:8.2s}
+#razhSplash .razh-particles i:nth-child(2){--dx:18px;--dy:-34px;--duration:9.4s}
+#razhSplash .razh-particles i:nth-child(3){--dx:-17px;--dy:-24px;--duration:7.8s}
+#razhSplash .razh-particles i:nth-child(4){--dx:12px;--dy:-31px;--duration:10.1s}
+#razhSplash .razh-particles i:nth-child(5){--dx:-10px;--dy:-38px;--duration:8.8s}
+#razhSplash .razh-particles i:nth-child(6){--dx:16px;--dy:-22px;--duration:9.7s}
+#razhSplash .razh-particles i:nth-child(7){--dx:-19px;--dy:-30px;--duration:8.5s}
+#razhSplash .razh-particles i:nth-child(8){--dx:11px;--dy:-36px;--duration:9.2s}
+@keyframes razhParticleDrift{
+ 0%{opacity:0;transform:translate3d(0,10px,0) scale(.55)}
+ 18%{opacity:.55}
+ 42%{opacity:.9;transform:translate3d(calc(var(--dx)*.45),calc(var(--dy)*.45),0) scale(1)}
+ 68%{opacity:.48;transform:translate3d(var(--dx),var(--dy),0) scale(1.18)}
+ 86%{opacity:.28}
+ 100%{opacity:0;transform:translate3d(calc(var(--dx)*1.25),calc(var(--dy)*1.25 - 8px),0) scale(.55)}
+}
+
+
+/* Pop-up peringatan masa aktif RAZH */
+#expiryAlertOverlay{position:fixed;inset:0;z-index:10000;background:rgba(8,13,24,.76);display:none;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(5px)}
+#expiryAlertOverlay.show{display:flex;overflow-y:auto}
+#expiryAlertDialog{position:relative;width:min(100%,560px);max-height:min(92dvh,850px);overflow:auto;background:#fff;border-radius:24px;padding:24px 20px 18px;box-shadow:0 24px 80px rgba(0,0,0,.35);animation:razhAlertIn .24s ease-out}
+@keyframes razhAlertIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+#expiryAlertClose{position:absolute;right:14px;top:13px;width:38px;height:38px;border:0;border-radius:50%;background:#f1f3f6;color:#4b5563;font-size:24px;line-height:1;cursor:pointer}
+#expiryAlertDialog .alert-kicker{font-size:11px;font-weight:850;letter-spacing:1.1px;color:#b42318;text-align:center}
+#expiryAlertDialog .alert-symbol{width:76px;height:76px;margin:12px auto 10px;border-radius:50%;display:grid;place-items:center;background:#fff0e8;color:#e65a19;font-size:36px}
+#expiryAlertTitle{text-align:center;font-size:clamp(23px,6vw,30px);line-height:1.15;margin:0;color:#172033}
+#expiryAlertLead{text-align:center;color:#667085;font-size:13px;margin:9px 0 17px}
+#expiryAlertItems{display:grid;gap:10px;margin:0 0 16px}
+.expiry-alert-item{background:#f6f8fb;border:1px solid #e6eaf0;border-radius:14px;padding:13px}
+.expiry-alert-item strong{display:block;color:#172033;font-size:14px;overflow-wrap:anywhere}
+.expiry-alert-item .expiry-alert-meta{font-size:12px;color:#667085;margin-top:4px}
+.expiry-alert-item .expiry-alert-status{font-size:13px;font-weight:850;color:#c2410c;margin-top:8px}
+#expiryAlertAdvice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:13px;padding:12px;font-size:12px;line-height:1.5;margin-bottom:14px}
+#expiryAlertActions{display:grid;gap:9px}
+#expiryAlertActions button{width:100%;min-height:48px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer}
+#expiryAlertRenew{border:0;background:#2563eb;color:#fff}
+#expiryAlertRead{border:1px solid #d0d5dd;background:#fff;color:#344054}
+#expiryAlertFoot{text-align:center;color:#98a2b3;font-size:10px;margin-top:11px}
+@media(max-width:420px){#expiryAlertOverlay{padding:9px}#expiryAlertDialog{padding:22px 15px 15px;border-radius:20px;max-height:94dvh}}
+@media(prefers-reduced-motion:reduce){#expiryAlertDialog{animation:none}}
+
+
+/* RAZH polish pass */
+#razhSplash:before,#razhSplash:after,
+#razhSplash .razh-mark:before,#razhSplash .razh-mark:after{display:none!important;content:none!important}
+#razhSplash .razh-mark{animation:razhLogoPop 1s cubic-bezier(.2,.8,.2,1) both!important}
+#razhSplash .razh-mark path{animation:none!important;stroke:none!important;fill:#fff!important}
+#razhSplash .razh-splash-brand{opacity:1!important;animation:razhBrandIn .8s ease .45s both!important}
+#razhSplash .razh-status{opacity:1!important;animation:razhBrandIn .75s ease .7s both!important}
+#razhSplash .razh-loader{opacity:1!important;animation:razhBrandIn .7s ease .9s both!important}
+#razhSplash .razh-loader i{animation:razhProgress 2.2s ease-in-out infinite!important}
+#razhSplash .razh-note{opacity:1!important;animation:razhBrandIn .75s ease 1.05s both!important}
+@keyframes razhLogoPop{from{opacity:0;transform:translateY(9px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+.renewal-account-card,.renewal-package{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease}
+.renewal-account-card:active,.renewal-package:active{transform:scale(.99)}
+.renewal-account-card.selected,.renewal-package.selected{box-shadow:0 5px 18px #2563eb18}
+.renewal-step:not([hidden]){animation:renewalStepIn .22s ease-out both}
+@keyframes renewalStepIn{from{opacity:.65;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.renewal-primary,.renewal-secondary{transition:transform .12s ease,filter .12s ease,box-shadow .12s ease}
+.renewal-primary:active,.renewal-secondary:active{transform:scale(.99)}
+.renewal-primary:hover:not(:disabled){filter:brightness(.97);box-shadow:0 5px 15px #2563eb25}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){
+ #razhSplash .razh-mark,#razhSplash .razh-splash-brand,#razhSplash .razh-status,#razhSplash .razh-loader,#razhSplash .razh-note,
+ #razhSplash .razh-particles i,.renewal-step:not([hidden]){animation:none!important}
+}
+
+
+/* Audit fix: intro tetap logo + partikel saja; nonaktifkan efek lama yang bertumpuk. */
+#razhSplash:before,
+#razhSplash:after,
+#razhSplash .razh-mark:before,
+#razhSplash .razh-mark:after{content:none!important;display:none!important}
+#razhSplash .razh-mark{animation:razhMarkIn .9s cubic-bezier(.18,.85,.25,1) both!important}
+#razhSplash path{animation:razhDraw 1.7s cubic-bezier(.65,0,.35,1) .25s forwards!important}
+/* Durasi partikel diatur masing-masing melalui --duration. */
+@media(prefers-reduced-motion:reduce){
+ #razhSplash .razh-particles i{animation:none!important;opacity:.32!important}
+}
+
+
+body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+.bottom-nav{position:fixed;z-index:9000;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e8edf5;box-shadow:0 -5px 22px #0f172a12}
+.bottom-nav.hidden{display:none!important}
+.bottom-nav-item{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:#8a94a5;border-radius:12px;padding:5px 2px;cursor:pointer}
+.bottom-nav-icon{font-size:23px;line-height:1.1;font-weight:800}.bottom-nav-item small{font-size:10px;font-weight:750;white-space:nowrap}
+.bottom-nav-item.active{color:#2563eb;background:#eff6ff}
+#homeDashboard[data-tab="home"] #homeWelcome,#homeDashboard[data-tab="home"] #dashboardSummary{display:block}
+#homeDashboard[data-tab="home"] #reminderCard,#homeDashboard[data-tab="home"] #historyCard,#homeDashboard[data-tab="home"] #moreCard{display:none!important}
+#homeDashboard[data-tab="monitoring"] #homeWelcome,#homeDashboard[data-tab="monitoring"] #dashboardSummary,#homeDashboard[data-tab="monitoring"] #reminderCard,#homeDashboard[data-tab="monitoring"] #moreCard{display:none!important}
+#homeDashboard[data-tab="monitoring"] #historyCard{display:block!important}
+#homeDashboard[data-tab="reminder"] #homeWelcome,#homeDashboard[data-tab="reminder"] #dashboardSummary,#homeDashboard[data-tab="reminder"] #historyCard,#homeDashboard[data-tab="reminder"] #moreCard{display:none!important}
+#homeDashboard[data-tab="reminder"] #reminderCard{display:block!important}
+#homeDashboard[data-tab="more"] #homeWelcome,#homeDashboard[data-tab="more"] #dashboardSummary,#homeDashboard[data-tab="more"] #reminderCard,#homeDashboard[data-tab="more"] #historyCard{display:none!important}
+#homeDashboard[data-tab="more"] #moreCard{display:block!important}
+.dashboard-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.dashboard-stat{padding:12px;border:1px solid #e8edf5;border-radius:13px;background:#f8faff;display:grid;grid-template-columns:25px 1fr;column-gap:6px;align-items:center}
+.dashboard-stat span{grid-row:span 2;color:#2563eb;font-size:19px;font-weight:900}.dashboard-stat strong{font-size:22px;line-height:1.1;color:#172033}.dashboard-stat small{font-size:10px;color:#778397}
+.dashboard-quick-actions{display:grid;grid-template-columns:1.2fr 1fr;gap:8px;margin-top:13px}.dashboard-quick-actions .btn{min-height:43px;padding:9px 10px;font-size:12px}
+.more-menu-list{display:grid;gap:9px}.more-menu-item{display:flex;align-items:center;gap:11px;width:100%;padding:13px;border:1px solid #e7ebf2;border-radius:13px;background:#fff;text-align:left;color:#1f2937;cursor:pointer}
+.more-menu-icon{flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:#eff6ff;color:#2563eb;font-size:19px;font-weight:850}
+.more-menu-item span:nth-child(2){display:grid;gap:2px;flex:1;min-width:0}.more-menu-item b{font-size:13px}.more-menu-item small{font-size:10px;color:#7b8493}.more-menu-item>strong{font-size:21px;color:#94a3b8}
+.more-disclaimer{margin-top:15px;padding:12px;border-radius:11px;background:#f8fafc;color:#778397;font-size:10px;line-height:1.6}
+@media(max-width:390px){.dashboard-quick-actions{grid-template-columns:1fr}.bottom-nav-item small{font-size:9px}}
+@media(min-width:700px){.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(100%,680px);border:1px solid #e8edf5;border-bottom:0;border-radius:16px 16px 0 0}}
+
+
+/* Final dashboard hierarchy and clickable status summary */
+#homeDashboard{display:flex;flex-direction:column;gap:0}
+#homeWelcome{order:1}
+#dashboardSummary{order:2}
+#dashboardRecentCard{order:3}
+#reminderCard{order:4}
+#historyCard{order:5}
+#moreCard{order:6}
+#dashboardSummary .dashboard-stat{display:flex;flex-direction:column;gap:4px;width:100%;min-height:112px;align-items:flex-start;justify-content:center;cursor:pointer;text-align:left;font:inherit;border:1px solid transparent;transition:transform .15s,box-shadow .15s}
+#dashboardSummary .dashboard-stat:active{transform:scale(.98)}
+#dashboardSummary .dashboard-stat:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+#dashboardSummary .dashboard-stat:nth-child(1){background:#eff6ff;border-color:#dbeafe}
+#dashboardSummary .dashboard-stat:nth-child(2){background:#ecfdf5;border-color:#d1fae5}
+#dashboardSummary .dashboard-stat:nth-child(3){background:#fff7e6;border-color:#fde7b0}
+#dashboardSummary .dashboard-stat:nth-child(4){background:#fef2f2;border-color:#fee2e2}
+#dashboardSummary .dashboard-stat:nth-child(1) span,#dashboardSummary .dashboard-stat:nth-child(1) strong,#dashboardSummary .dashboard-stat:nth-child(1) small{color:#1d4ed8}
+#dashboardSummary .dashboard-stat:nth-child(2) span,#dashboardSummary .dashboard-stat:nth-child(2) strong,#dashboardSummary .dashboard-stat:nth-child(2) small{color:#047857}
+#dashboardSummary .dashboard-stat:nth-child(3) span,#dashboardSummary .dashboard-stat:nth-child(3) strong,#dashboardSummary .dashboard-stat:nth-child(3) small{color:#b45309}
+#dashboardSummary .dashboard-stat:nth-child(4) span,#dashboardSummary .dashboard-stat:nth-child(4) strong,#dashboardSummary .dashboard-stat:nth-child(4) small{color:#b91c1c}
+#dashboardSummary .dashboard-stat small{font-weight:750}
+.history-status-filters{display:flex;gap:7px;overflow-x:auto;padding:3px 1px 8px;margin-top:10px;scrollbar-width:none}
+.history-status-filters::-webkit-scrollbar{display:none}
+.history-status-filter{flex:0 0 auto;border:1px solid #e5eaf2;background:#fff;color:#667085;border-radius:30px;padding:8px 12px;font-size:11px;font-weight:800}
+.history-status-filter.active{background:#172033;border-color:#172033;color:#fff}
+.dashboard-recent-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f5}
+.dashboard-recent-row:last-child{border-bottom:0}
+.dashboard-recent-row strong{display:block;font-size:12px;overflow-wrap:anywhere}
+.dashboard-recent-row small{display:block;color:#8490a1;font-size:10px;margin-top:3px}
+.dashboard-recent-id{font:750 10px ui-monospace,monospace;color:#2454a6;background:#edf4ff;border-radius:7px;padding:5px 7px;white-space:nowrap}
+#homeDashboard[data-tab="home"] #dashboardRecentCard{display:block}
+#homeDashboard[data-tab="monitoring"] #dashboardRecentCard,#homeDashboard[data-tab="reminder"] #dashboardRecentCard,#homeDashboard[data-tab="more"] #dashboardRecentCard{display:none!important}
+#homeDashboard[data-tab="home"] #homeWelcome{display:block}
+#homeDashboard[data-tab="home"] #dashboardSummary{display:block}
+
+ 
+.history-tools-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0}
+.history-tool-field{display:grid;gap:5px;color:#748096;font-size:10px;font-weight:800}
+.history-tool-field select{width:100%;min-width:0;height:42px;padding:0 9px;border:1px solid #e1e7f0;border-radius:11px;background:#fff;color:#334155;font-size:11px;font-weight:700}
+.history-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.history-card-actions button{min-width:0;min-height:40px;padding:8px 9px;border-radius:10px;font-size:11px;font-weight:800}
+.history-id-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding:8px 9px;border-radius:9px;background:#edf4ff}
+.history-id-line code{font-size:10px;font-weight:800;color:#2454a6;overflow-wrap:anywhere}
+.history-id-line button{flex:0 0 auto;border:0;border-radius:8px;background:#dceaff;color:#2454a6;padding:7px 9px;font-size:10px;font-weight:850}
+@media(max-width:390px){.history-tools-row{grid-template-columns:1fr}.history-card-actions{grid-template-columns:1fr 1fr}}
+
+
+/* Fix ID Order layout in Masa Aktif detail panel */
+.reminder-detail-order{
+ display:flex!important;
+ flex-direction:row!important;
+ align-items:center!important;
+ justify-content:space-between!important;
+ gap:10px!important;
+ width:100%;
+ min-width:0;
+}
+.reminder-detail-order code{
+ display:block!important;
+ flex:1 1 auto!important;
+ min-width:0!important;
+ max-width:100%;
+ white-space:nowrap!important;
+ word-break:normal!important;
+ overflow-wrap:normal!important;
+ overflow-x:auto;
+ scrollbar-width:thin;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+ font-size:clamp(10px,2.8vw,12px)!important;
+ line-height:1.4!important;
+}
+.reminder-detail-order button{
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ flex:0 0 auto!important;
+ width:auto!important;
+ min-width:86px;
+ max-width:110px;
+ white-space:nowrap!important;
+}
+
+
+/* RAZH Help Center */
+.guide-center{max-width:760px;margin:0 auto;padding:10px 14px 28px}
+.guide-top-actions{display:flex;justify-content:stretch;width:100%;margin:0 0 17px}
+.guide-back{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border:1px solid #ffffff45;background:#ffffff20;color:#fff;border-radius:13px;padding:13px 16px;font-weight:850;font-size:14px;letter-spacing:.1px;box-shadow:0 4px 12px #07142630}
+.guide-back:active{background:#ffffff30;transform:scale(.99)}
+.guide-back:active{background:#ffffff2b;transform:scale(.98)}
+.guide-hero{background:linear-gradient(145deg,#101827,#263b5d);color:#fff;border-radius:22px;padding:22px 18px 18px;box-shadow:0 12px 28px #15233b18}
+.guide-hero-icon{width:42px;height:42px;border-radius:14px;background:#2563eb;display:grid;place-items:center;font-size:25px;font-weight:900;margin-bottom:14px}
+.guide-kicker{font-size:10px;letter-spacing:1.3px;font-weight:900;color:#93b8ff}
+.guide-hero h2{font-size:25px;margin:5px 0 7px;color:#fff}
+.guide-hero p{font-size:12px;line-height:1.6;color:#d4deed;margin:0 0 15px}
+.guide-search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e5eaf2;border-radius:13px;padding:0 11px;height:48px;color:#64748b}
+.guide-search>span{font-size:22px}.guide-search input{flex:1;min-width:0;border:0!important;box-shadow:none!important;outline:0;font-size:13px;color:#1f2937;padding:0}
+.guide-search button{border:0;background:#eef2f7;color:#64748b;border-radius:50%;width:27px;height:27px;font-size:19px}
+.guide-featured{background:#eff6ff;border:1px solid #dbeafe;border-radius:18px;padding:16px;margin:13px 0 22px}
+.guide-featured-tag{font-size:9px;letter-spacing:.8px;font-weight:900;color:#2563eb;margin-bottom:12px}
+.guide-featured-row{display:flex;gap:11px;align-items:flex-start}
+.guide-featured-icon{width:40px;height:40px;flex:0 0 40px;border-radius:12px;background:#dbeafe;color:#2563eb;display:grid;place-items:center;font-size:22px;font-weight:900}
+.guide-featured h3{font-size:15px;margin:0 0 5px;color:#172033}
+.guide-featured p{font-size:11px;line-height:1.55;color:#53657f;margin:0}
+.guide-primary-btn{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-radius:11px;background:#2563eb;color:#fff;padding:12px 14px;font-size:12px;font-weight:850;margin-top:14px}
+.guide-primary-btn span{font-size:20px}
+.guide-section-heading{display:flex;justify-content:space-between;align-items:end;margin:0 2px 11px}
+.guide-section-heading h3{font-size:19px;margin:3px 0 0}
+.guide-count{font-size:10px;color:#748096;background:#eef2f7;padding:6px 9px;border-radius:20px}
+.guide-topic-list{display:grid;gap:9px}
+.guide-topic{background:#fff;border:1px solid #e5eaf1;border-radius:15px;overflow:hidden;box-shadow:0 3px 12px #15233b05}
+.guide-topic summary{list-style:none;display:flex;align-items:center;gap:11px;padding:13px;cursor:pointer}
+.guide-topic summary::-webkit-details-marker{display:none}
+.guide-topic-icon{width:37px;height:37px;flex:0 0 37px;border-radius:11px;display:grid;place-items:center;font-size:17px;font-weight:900}
+.guide-topic-icon.blue{background:#eff6ff;color:#2563eb}.guide-topic-icon.purple{background:#f3f0ff;color:#7652c8}.guide-topic-icon.green{background:#ecfdf5;color:#059669}.guide-topic-icon.amber{background:#fff7e6;color:#c17a08}.guide-topic-icon.red{background:#fef2f2;color:#dc2626}
+.guide-topic-title{display:grid;gap:3px;flex:1;min-width:0}.guide-topic-title b{font-size:12px;color:#263244}.guide-topic-title small{font-size:10px;color:#8490a1;line-height:1.4}
+.guide-chevron{font-size:22px;color:#94a3b8;transition:transform .2s}
+.guide-topic[open] .guide-chevron{transform:rotate(90deg)}
+.guide-topic-body{border-top:1px solid #edf0f5;padding:13px 15px 15px;font-size:12px;line-height:1.7;color:#475569}
+.guide-topic-body h4{font-size:12px;color:#1f2937;margin:0 0 7px}
+.guide-topic-body h4:not(:first-child){margin-top:14px}
+.guide-topic-body ol,.guide-topic-body ul{padding-left:19px;margin:5px 0 10px}
+.guide-topic-body li{padding-left:2px;margin:5px 0}
+.guide-topic-body b{color:#243b5b}
+.guide-note{background:#f1f6ff;border-left:3px solid #60a5fa;border-radius:8px;padding:10px 11px;font-size:11px;line-height:1.55;color:#49617f;margin-top:10px}
+.guide-inline-action{border:0;background:#2563eb;color:#fff;border-radius:10px;padding:11px 13px;font-weight:850;font-size:11px;margin-top:12px;width:100%}
+.guide-no-results{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:22px;text-align:center;color:#748096;font-size:12px}
+.guide-contact{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e5eaf1;border-radius:15px;padding:13px;margin-top:17px}
+.guide-contact-icon{width:37px;height:37px;flex:0 0 37px;border-radius:11px;background:#eff6ff;color:#2563eb;display:grid;place-items:center;font-size:19px}
+.guide-contact div:nth-child(2){flex:1;min-width:0}.guide-contact b{font-size:12px}.guide-contact p{font-size:10px;color:#8490a1;margin:3px 0 0;line-height:1.4}
+.guide-contact button{border:0;background:#2563eb;color:white;border-radius:9px;padding:9px 10px;font-size:10px;font-weight:850}
+.guide-footer{text-align:center;color:#8993a2;font-size:10px;line-height:1.6;margin:17px 8px}
+@media(min-width:700px){.guide-center{padding-left:20px;padding-right:20px}.guide-topic-list{grid-template-columns:1fr 1fr}.guide-topic[open]{grid-column:1/-1}}
+
+</style>
+</head>
+<body>
+
+<div id="razhSplash" role="status" aria-label="Menyiapkan layanan monitoring RAZH">
+ <div class="razh-particles" aria-hidden="true">
+  <i style="--x:12%;--y:24%;--d:0s;--s:3px"></i>
+  <i style="--x:24%;--y:68%;--d:.4s;--s:2px"></i>
+  <i style="--x:78%;--y:22%;--d:.8s;--s:3px"></i>
+  <i style="--x:88%;--y:62%;--d:1.1s;--s:2px"></i>
+  <i style="--x:66%;--y:78%;--d:.2s;--s:2px"></i>
+  <i style="--x:35%;--y:16%;--d:1.4s;--s:2px"></i>
+  <i style="--x:8%;--y:48%;--d:.7s;--s:2px"></i>
+  <i style="--x:92%;--y:39%;--d:1.6s;--s:3px"></i>
+ </div>
+
+ <div class="razh-mark" aria-hidden="true">
+  <svg viewBox="0 0 120 120" role="img" aria-label="Logo huruf R">
+    <path fill="#ffffff" fill-rule="evenodd" d="M24 101V19h43c24 0 37 13 37 34 0 17-9 28-25 32l23 16H73L48 82v19H24zm24-40h18c10 0 15-3 15-9s-5-10-15-10H48v19z"/>
+   </svg>
+ </div>
+ <div class="razh-splash-brand">RAZH <span>•</span> MONITORING</div>
+ <div class="razh-status">Menyiapkan halaman</div>
+ <div class="razh-loader" aria-hidden="true"><i></i></div>
+ <div class="razh-note">LAYANAN MONITORING INDEPENDEN MILIK SELLER</div>
+</div>
+
+<div id="liveClock" role="status" aria-live="off">
+ <span>🕒 <b id="clockTime">--:--:--</b></span>
+ <span id="clockDate">Memuat tanggal...</span>
+ <span class="clock-zone">Waktu perangkat</span>
+</div>
+<header><div class="head">
+ <div class="brand"><span class="logo">R</span><span>RAZH • MONITORING PAKET</span></div>
+ <h1 id="pageTitle">Pantau masa aktif paket</h1>
+ <p id="pageSubtitle">Layanan monitoring independen milik seller untuk mencatat pesanan dan memantau masa aktif paket.</p>
+</div></header>
+<main>
+ <div id="globalBackWrap" class="hidden" style="margin:0 0 16px">
+  <button class="btn primary" id="globalBackBtn" type="button" style="width:100%;min-height:50px;padding:12px 16px;font-size:15px;box-shadow:0 4px 12px #2563eb30">← KEMBALI KE BERANDA</button>
+ </div>
+ <div id="homeDashboard">
+<section class="card dashboard-summary" id="dashboardSummary" style="margin-top:15px">
+ <div class="kicker">RINGKASAN</div><h2 class="question" style="font-size:19px">Dashboard RAZH</h2>
+ <p class="sub" style="margin-bottom:13px">Ringkasan riwayat yang tersimpan di browser/perangkat ini.</p>
+ <div class="dashboard-stats">
+  <button type="button" class="dashboard-stat" onclick="openHistoryStatus('all')" aria-label="Lihat semua riwayat"><span>▤</span><strong id="dashTotal">0</strong><small>Total riwayat · Lihat daftar ›</small></button>
+  <button type="button" class="dashboard-stat" onclick="openHistoryStatus('active')" aria-label="Lihat paket yang masih aktif"><span>✓</span><strong id="dashActive">0</strong><small>Masih aktif · Lihat daftar ›</small></button>
+  <button type="button" class="dashboard-stat" onclick="openHistoryStatus('soon')" aria-label="Lihat paket yang segera habis"><span>!</span><strong id="dashSoon">0</strong><small>Segera habis · Lihat daftar ›</small></button>
+  <button type="button" class="dashboard-stat" onclick="openHistoryStatus('expired')" aria-label="Lihat paket yang sudah habis"><span>×</span><strong id="dashExpired">0</strong><small>Sudah habis · Lihat daftar ›</small></button>
+ </div>
+ <div class="dashboard-quick-actions"><button class="btn primary" type="button" id="dashCreateBtn">＋ Isi Form Monitoring</button><button class="btn secondary" type="button" id="dashHistoryBtn">Buka Riwayat</button></div>
+</section>
+<section class="card" id="homeWelcome" style="margin-top:15px">
+  <div class="kicker">BERANDA</div>
+  <h2 class="question" style="font-size:20px">Selamat datang!</h2>
+  <p class="sub" style="margin-bottom:14px">Baru membeli paket? Isi formulir agar data pesanan tercatat dan masa aktifnya bisa dipantau. Jika sudah pernah mengisi, cek pengingat dan riwayat di bawah. Layanan ini dikelola secara independen oleh seller dan tidak berafiliasi dengan Netflix.</p>
+  <div class="first-time-guide">
+   <span class="first-time-guide-label"><span class="first-time-guide-dot"></span> BARU PERTAMA KALI? MULAI DI SINI</span>
+   <button class="btn primary first-time-cta" id="createMonitoringBtn" type="button" style="width:100%">
+    <span>＋ Isi Form Monitoring</span><span class="first-time-cta-arrow" aria-hidden="true">›</span>
+   </button>
+  </div>
+ </section>
+<section class="card" id="dashboardRecentCard" style="margin-top:15px">
+ <div class="section-head" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+  <div><div class="kicker">AKTIVITAS TERBARU</div><h2 class="question" style="font-size:19px;margin:0">Pesanan terbaru</h2></div>
+  <button type="button" class="btn secondary" id="dashboardSeeAllBtn">Lihat semua</button>
+ </div>
+ <div id="dashboardRecentList"><div class="hint">Belum ada riwayat monitoring.</div></div>
+</section>
+<section class="card" id="reminderCard" style="margin-top:15px">
+  <div class="kicker">PENGINGAT MASA AKTIF</div>
+  <h2 class="question" style="font-size:20px">Masa aktif paket</h2>
+  <p class="sub">Pantau sisa masa paket dari riwayat lokal di browser/perangkat ini. Data cloud Firebase tidak otomatis ditarik ke halaman ini. Status mengikuti tanggal perangkat.</p>
+  <div id="reminderList" style="display:grid;gap:10px"></div>
+  <button class="btn secondary" id="openExpiryAlertBtn" type="button" style="width:100%;margin-top:12px">Lihat Popup Pengingat Masa Aktif</button>
+  <div class="hint">Pengingat ini hanya tampil saat website dibuka. Website tidak mengirim notifikasi jika ditutup.</div>
+ </section>
+ <section class="card" id="historyCard" style="margin-top:15px">
+  <div class="kicker">ARSIP PENGISIAN DI PERANGKAT INI</div>
+  <h2 class="question" style="font-size:20px">Riwayat monitoring</h2>
+  <p class="sub">Catatan lokal di browser/perangkat ini. Status pembayaran dan persetujuan tetap harus dikonfirmasi admin.</p>
+  <div class="history-search-wrap">
+   <span class="history-search-icon" aria-hidden="true">⌕</span>
+   <input id="historySearch" type="search" placeholder="Cari ID order, email, nomor WA..." aria-label="Cari riwayat monitoring">
+   <button id="clearHistorySearch" class="history-clear" type="button" aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
+  </div>
+  <div class="history-search-help">Bisa masukkan ID lengkap <b>RZH-202611145774</b> atau angka saja <b>202611145774</b>.</div>
+  <div class="history-status-filters" role="group" aria-label="Filter status pesanan">
+   <button type="button" class="history-status-filter active" data-status-filter="all">Semua</button>
+   <button type="button" class="history-status-filter" data-status-filter="active">Masih Aktif</button>
+   <button type="button" class="history-status-filter" data-status-filter="soon">Segera Habis</button>
+   <button type="button" class="history-status-filter" data-status-filter="expired">Sudah Habis</button>
+  </div>
+  <div class="history-tools-row">
+   <label class="history-tool-field"><span>Jenis akun</span><select id="historyTypeFilter"><option value="all">Semua jenis akun</option><option value="Sharing">Sharing</option><option value="Semi Private">Semi Private</option></select></label>
+   <label class="history-tool-field"><span>Urutkan</span><select id="historySort"><option value="newest">Terbaru</option><option value="oldest">Terlama</option><option value="expiry-asc">Tanggal habis terdekat</option><option value="expiry-desc">Tanggal habis terjauh</option><option value="email-asc">Email A–Z</option></select></label>
+  </div>
+  <div class="history-results-row"><div id="historyCount" class="hint">Belum ada riwayat tersimpan.</div><span class="history-local-tag">ARSIP LOKAL</span></div>
+  <div id="historyList" style="display:grid;gap:10px;margin-top:12px"></div>
+  <div class="hint">Riwayat ini hanya tersimpan di browser/perangkat ini. Pengiriman WhatsApp dan penyimpanan Firebase adalah proses terpisah.</div>
+ </section>
+ <section class="card dashboard-tab-card" id="moreCard" style="margin-top:15px">
+  <div class="kicker">PUSAT INFORMASI</div><h2 class="question" style="font-size:20px">Lainnya</h2>
+  <p class="sub">Akses bantuan dan informasi layanan RAZH Monitoring.</p>
+  <div class="more-menu-list">
+   <button type="button" class="more-menu-item" id="moreGuideBtn"><span class="more-menu-icon">ⓘ</span><span><b>Panduan Monitoring</b><small>Cara mengisi dan menggunakan layanan</small></span><strong>›</strong></button>
+   <button type="button" class="more-menu-item" id="moreTermsBtn"><span class="more-menu-icon">▤</span><span><b>Syarat & Ketentuan</b><small>Baca ketentuan sebelum mengisi format</small></span><strong>›</strong></button>
+   <button type="button" class="more-menu-item" id="moreReminderBtn"><span class="more-menu-icon">◷</span><span><b>Pengingat Masa Aktif</b><small>Lihat status paket dan tanggal habis</small></span><strong>›</strong></button>
+   <button type="button" class="more-menu-item" id="moreAdminBtn"><span class="more-menu-icon">☏</span><span><b>Hubungi Admin</b><small>Tanyakan kendala atau status pesanan</small></span><strong>›</strong></button>
+  </div>
+  <div class="more-disclaimer">RAZH adalah layanan monitoring independen milik seller dan tidak berafiliasi dengan Netflix. Riwayat pada halaman ini tersimpan secara lokal di browser/perangkat.</div>
+ </section>
+ </div>
+
+<section id="guideCenter" class="guide-center hidden">
+ <section class="guide-hero">
+  <div class="guide-top-actions">
+   <button type="button" class="guide-back" id="guideBackBtn">← Kembali ke Lainnya</button>
+  </div>
+  <div class="guide-hero-icon">?</div>
+  <div class="guide-kicker">RAZH HELP CENTER</div>
+  <h2>Pusat Bantuan</h2>
+  <p>Temukan panduan cara menggunakan fitur RAZH Monitoring dan solusi kendala umum.</p>
+  <label class="guide-search">
+   <span aria-hidden="true">⌕</span>
+   <input id="guideSearch" type="search" placeholder="Cari panduan, fitur, atau kendala..." autocomplete="off">
+   <button type="button" id="guideSearchClear" aria-label="Hapus pencarian">×</button>
+  </label>
+ </section>
+ <section class="guide-featured">
+  <div class="guide-featured-tag">PANDUAN UTAMA · UNTUK PENGGUNA BARU</div>
+  <div class="guide-featured-row"><span class="guide-featured-icon">✎</span><div><h3>Cara Mengisi Form Monitoring</h3><p>Panduan dari mulai membuka formulir, mengisi data, memeriksa, hingga mengirim format ke WhatsApp Admin.</p></div></div>
+  <button type="button" class="guide-primary-btn" data-guide-open="form">Pelajari cara mengisi form <span>›</span></button>
+ </section>
+ <div class="guide-section-heading"><div><span class="guide-kicker">PILIH SESUAI KEBUTUHAN</span><h3>Panduan fitur</h3></div><span class="guide-count" id="guideCount">9 topik</span></div>
+ <div class="guide-topic-list" id="guideTopicList">
+  <details class="guide-topic" data-topic="form">
+   <summary><span class="guide-topic-icon blue">✎</span><span class="guide-topic-title"><b>Form Monitoring</b><small>Pengisian, koreksi, dan pengiriman data</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body">
+    <h4>Langkah mengisi formulir</h4>
+    <ol><li>Dari Beranda, tekan <b>Isi Form Monitoring</b>.</li><li>Baca keterangan serta syarat dan ketentuan yang ditampilkan, lalu setujui untuk melanjutkan.</li><li>Isi setiap kolom sesuai paket dan perangkat yang digunakan. Periksa email, profil, jenis akun, durasi, tanggal login, jam login, perangkat, dan nomor WhatsApp.</li><li>Setelah masuk ke halaman pemeriksaan, baca ulang seluruh data. Pastikan tidak ada salah ketik.</li><li>Jika ada kesalahan, tekan <b>Ubah data</b> untuk kembali ke formulir.</li><li>Jika sudah benar, tekan <b>Kirim ke WhatsApp Admin</b>. WhatsApp akan terbuka dengan format yang sudah disiapkan; periksa pesannya lalu kirim.</li></ol>
+    <div class="guide-note"><b>Tips:</b> Simpan format monitoring dan ID Order. Jangan mengirim kata sandi atau kode OTP Netflix.</div>
+    <button type="button" class="guide-inline-action" id="guideStartForm">＋ Mulai Isi Form Monitoring</button>
+   </div>
+  </details>
+  <details class="guide-topic" data-topic="history">
+   <summary><span class="guide-topic-icon purple">▤</span><span class="guide-topic-title"><b>Riwayat Monitoring</b><small>Melihat, mencari, dan membuka pesanan</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Melihat riwayat</h4><ol><li>Buka menu <b>Monitoring</b> di navigasi bawah.</li><li>Gunakan kolom pencarian untuk mencari berdasarkan ID Order, email, nomor WhatsApp, profil, atau tanggal yang tersimpan.</li><li>ID dapat dicari dengan awalan <b>RZH-</b> maupun angka ID tanpa awalan.</li><li>Tekan kartu pesanan atau tombol detail untuk melihat rincian yang tersimpan.</li></ol><div class="guide-note">Riwayat yang ditampilkan di bagian arsip lokal tersimpan pada browser/perangkat ini. Riwayat lokal tidak otomatis sama dengan konfirmasi admin atau data Firebase.</div></div>
+  </details>
+  <details class="guide-topic" data-topic="filter">
+   <summary><span class="guide-topic-icon blue">☷</span><span class="guide-topic-title"><b>Filter dan Pengurutan</b><small>Menyaring dan mengurutkan daftar pesanan</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Menyaring pesanan</h4><ol><li>Masuk ke menu <b>Monitoring</b>.</li><li>Pilih status <b>Semua</b>, <b>Masih Aktif</b>, <b>Segera Habis</b>, atau <b>Sudah Habis</b>.</li><li>Jika tersedia, pilih jenis akun Sharing atau Semi Private.</li><li>Gunakan pilihan <b>Urutkan</b> untuk memilih terbaru, terlama, tanggal habis terdekat/terjauh, atau email A–Z.</li></ol><div class="guide-note">Filter dan pengurutan hanya mengubah tampilan daftar; tidak mengubah data pesanan.</div></div>
+  </details>
+  <details class="guide-topic" data-topic="id">
+   <summary><span class="guide-topic-icon green">#</span><span class="guide-topic-title"><b>ID Order</b><small>Mengenali, mencari, dan menyalin ID</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Menggunakan ID Order</h4><ol><li>Temukan ID Order pada kartu atau detail pesanan.</li><li>Tekan <b>Salin ID</b> untuk menyalin nomor saja.</li><li>Untuk mencari pesanan, tempelkan ID lengkap (contoh <b>RZH-202611145774</b>) atau angka ID tanpa awalan.</li></ol><div class="guide-note">ID Order membantu membedakan pesanan saat berkomunikasi dengan Admin. Simpan ID bersama format monitoring.</div></div>
+  </details>
+  <details class="guide-topic" data-topic="copy">
+   <summary><span class="guide-topic-icon blue">▣</span><span class="guide-topic-title"><b>Salin Format Monitoring</b><small>Menyalin dan menyimpan rincian pesanan</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Menyalin format</h4><ol><li>Buka menu <b>Monitoring</b> dan temukan pesanan yang dimaksud.</li><li>Tekan <b>Salin Format</b> pada kartu pesanan.</li><li>Tempelkan hasil salinan ke catatan pribadi atau tempat aman yang mudah ditemukan kembali.</li><li>Pastikan ID Order ikut tersimpan agar format mudah dicocokkan dengan pesanan.</li></ol><div class="guide-note">Simpan format untuk keperluan pengecekan atau klaim sesuai ketentuan layanan.</div></div>
+  </details>
+  <details class="guide-topic" data-topic="expiry">
+   <summary><span class="guide-topic-icon amber">◷</span><span class="guide-topic-title"><b>Masa Aktif dan Pengingat</b><small>Memahami status serta tanggal habis paket</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Memahami status paket</h4><ul><li><b>Masih Aktif:</b> tanggal habis masih di luar periode peringatan paket.</li><li><b>Segera Habis:</b> paket sudah masuk periode peringatan berdasarkan durasinya.</li><li><b>Berakhir hari ini:</b> tanggal habis jatuh pada hari ini.</li><li><b>Sudah Habis:</b> tanggal habis sudah terlewati.</li></ul><h4>Melihat pengingat</h4><ol><li>Buka menu <b>Masa Aktif</b>.</li><li>Lihat status dan tanggal habis pada kartu paket.</li><li>Tekan detail pesanan untuk melihat informasi lebih lanjut.</li><li>Gunakan tombol pengajuan perpanjangan jika ingin menghubungi admin mengenai perpanjangan.</li></ol><div class="guide-note">Status dihitung dari tanggal pada catatan monitoring perangkat, bukan pemeriksaan langsung ke akun Netflix. Pengingat website tampil saat website dibuka.</div></div>
+  </details>
+  <details class="guide-topic" data-topic="renewal">
+   <summary><span class="guide-topic-icon green">↻</span><span class="guide-topic-title"><b>Ajukan Perpanjangan</b><small>Meminta bantuan untuk memperpanjang paket</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Cara mengajukan</h4><ol><li>Buka menu <b>Masa Aktif</b> atau detail pesanan.</li><li>Pilih pesanan yang ingin diperpanjang.</li><li>Tekan <b>Ajukan Perpanjangan</b>.</li><li>Ikuti arahan WhatsApp atau instruksi yang ditampilkan dan tunggu konfirmasi admin.</li></ol><div class="guide-note">Pengajuan bukan berarti perpanjangan sudah berhasil. Pastikan mendapat konfirmasi dari Admin.</div></div>
+  </details>
+  <details class="guide-topic" data-topic="payment">
+   <summary><span class="guide-topic-icon amber">▧</span><span class="guide-topic-title"><b>Pembayaran dan Konfirmasi</b><small>QRIS serta konfirmasi kepada admin</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Setelah melakukan pembayaran</h4><ol><li>Ikuti instruksi pembayaran yang diberikan pada alur pemesanan.</li><li>Periksa kembali nominal dan tujuan pembayaran sebelum menyelesaikan transaksi.</li><li>Kirim bukti pembayaran kepada Admin sesuai instruksi.</li><li>Tunggu pemeriksaan dan konfirmasi Admin.</li></ol><div class="guide-note">Website tidak memverifikasi pembayaran QRIS secara otomatis. Status pembayaran tetap perlu dikonfirmasi oleh Admin.</div></div>
+  </details>
+  <details class="guide-topic" data-topic="troubleshoot">
+   <summary><span class="guide-topic-icon red">!</span><span class="guide-topic-title"><b>Kendala Umum dan Keamanan</b><small>Solusi awal dan menjaga data pesanan</small></span><span class="guide-chevron">›</span></summary>
+   <div class="guide-topic-body"><h4>Jika mengalami kendala</h4><ul><li><b>Gagal menyalin:</b> coba tekan kembali. Jika browser tidak mendukung, pilih teks lalu salin secara manual.</li><li><b>Riwayat tidak ditemukan:</b> periksa ejaan email/ID dan pastikan menggunakan browser serta perangkat tempat riwayat lokal disimpan.</li><li><b>WhatsApp tidak terbuka:</b> pastikan aplikasi atau browser dapat membuka tautan WhatsApp, lalu coba lagi.</li><li><b>Data pesanan berbeda:</b> hubungi Admin dan sertakan ID Order serta format monitoring.</li></ul><h4>Keamanan data</h4><ul><li>Jangan membagikan kata sandi atau kode OTP.</li><li>Simpan ID Order dan format monitoring secara pribadi.</li><li>Periksa kembali nomor tujuan dan rincian sebelum mengirim pesan.</li></ul></div>
+  </details>
+ </div>
+ <div class="guide-no-results hidden" id="guideNoResults">Tidak ada panduan yang cocok. Coba kata kunci lain.</div>
+ <section class="guide-contact">
+  <div class="guide-contact-icon">☏</div><div><b>Masih butuh bantuan?</b><p>Hubungi Admin RAZH jika kendala belum teratasi.</p></div>
+  <button type="button" id="guideContactAdmin">Hubungi Admin</button>
+ </section>
+ <p class="guide-footer">RAZH Monitoring adalah layanan monitoring independen milik seller dan tidak berafiliasi dengan Netflix.</p>
+</section>
+
+ <section class="card hidden" id="intro">
+  <div class="kicker">MOHON DIBACA SEBELUM MENGISI</div>
+  <h2 class="question">Keterangan & penting!</h2>
+  <p class="sub">Mohon pahami tujuan pengisian data dan ketentuan berikut sebelum melanjutkan.</p>
+  <div class="intro-step-hint" role="note">
+   <span class="intro-step-hint-icon" aria-hidden="true">↓</span>
+   <div><b>Ikuti langkah berikut</b><span>Baca keterangan, gulir sampai paling bawah, centang persetujuan, lalu tekan “Saya Mengerti, Mulai Isi Form”.</span></div>
+  </div>
+  <div style="display:grid;gap:13px">
+   <div style="padding:14px;border:1px solid #eee;border-radius:13px">
+    <b style="display:block;margin-bottom:6px">📌 Tujuan penggunaan data</b>
+    <div style="font-size:13px;color:#555">Data yang kamu isi digunakan oleh seller untuk mencatat pesanan, mencocokkan perangkat, dan membantu memantau masa aktif paket. Website ini bukan layanan resmi Netflix dan tidak berafiliasi dengan Netflix.</div>
+   </div>
+   <div style="padding:14px;border:1px solid #d9eee1;background:#f5fff8;border-radius:13px">
+    <b style="display:block;margin-bottom:6px">🔒 Privasi data</b>
+    <div style="font-size:13px;color:#45604e">Data yang dikirim akan diterima oleh admin dan digunakan sesuai keperluan monitoring serta pelayanan akun. Jangan mengirimkan informasi sensitif seperti password atau kode OTP.</div>
+   </div>
+   <div style="padding:14px;border:1px solid #ffe3b5;background:#fff9ef;border-radius:13px">
+    <b style="display:block;margin-bottom:6px">⚠️ Perhatian</b>
+    <div style="font-size:13px;color:#755018">Isi seluruh data dengan benar, lengkap, dan sesuai perangkat yang digunakan. Kesalahan pengisian, data tidak lengkap, atau informasi yang tidak sesuai dapat menyulitkan proses validasi dan klaim garansi. Jika format tidak diisi atau data tidak sesuai ketentuan, akun dapat dianggap tidak bergaransi sesuai kebijakan seller.</div>
+   </div>
+  </div>
+  <div class="intro-bottom-hint"><span aria-hidden="true">↓</span> Kamu sudah sampai di bagian akhir. Centang kotak di bawah untuk melanjutkan.</div>
+  <label class="intro-consent-label" style="display:flex;align-items:flex-start;gap:10px;margin-top:10px;font-weight:650;line-height:1.4">
+   <input id="agreeIntro" type="checkbox" style="width:19px;height:19px;min-width:19px;margin:1px 0 0;accent-color:#2563eb">
+   <span>Saya sudah membaca dan memahami keterangan di atas.</span>
+  </label>
+  <div class="error" id="introError" role="alert"></div>
+  <div class="actions">
+   <button class="btn secondary" id="introHomeBtn" type="button">Kembali ke Beranda</button>
+   <button class="btn primary" id="startBtn" type="button">Saya Mengerti, Mulai Isi Form</button>
+  </div>
+ </section>
+ <div class="progress-wrap hidden" id="progressWrap">
+  <div class="progress-meta"><span id="progressLabel">LANGKAH 1</span><span id="progressCount">1 dari 10</span></div>
+  <div class="track"><div class="bar" id="progressBar"></div></div>
+ </div>
+ <section class="card hidden" id="wizard">
+  <div class="kicker" id="stepKicker">LANGKAH 01</div>
+  <h2 class="question" id="question">Pilih jenis akun</h2>
+  <p class="sub" id="sub">Tentukan paket yang kamu beli.</p>
+  <div id="fieldArea"></div>
+  <div class="error" id="errorBox" role="alert"></div>
+  <div class="actions">
+   <button class="btn secondary hidden" id="backBtn" type="button">Kembali</button>
+   <button class="btn primary" id="nextBtn" type="button">Lanjutkan</button>
+  </div>
+ </section>
+ <section class="card hidden" id="review">
+  <div class="kicker">TAHAP TERAKHIR</div>
+  <h2 class="question">Periksa data kamu</h2>
+  <p class="sub">Pastikan seluruh informasi sudah benar. Jika ada yang salah, tekan tombol Ubah.</p>
+  <div class="review-list" id="reviewList"></div>
+  <div id="cloudSaveStatus" class="notice" role="status" aria-live="polite" style="margin-top:12px">Menyiapkan penyimpanan data...</div>
+  <div class="notice">Simpan format monitoring ini. Setelah dikirim, seller/admin akan menerima data yang kamu isi.</div>
+  <div class="preview" id="messagePreview"></div>
+  <div id="manualCopyWrap" class="hidden" style="margin-top:12px">
+   <label for="manualCopyText">Teks siap disalin</label>
+   <textarea id="manualCopyText" readonly style="width:100%;min-height:220px;padding:12px;border:1px solid #ccc;border-radius:12px;font:12px/1.6 ui-monospace,monospace;white-space:pre-wrap;user-select:text;-webkit-user-select:text"></textarea>
+   <div class="notice">Browser kamu membatasi salin otomatis. Tekan lama teks di atas, pilih <b>Pilih semua</b>, lalu tekan <b>Salin</b>.</div>
+  </div>
+  <div class="error" id="sendError"></div>
+  <section class="review-action-guide" aria-labelledby="reviewActionGuideTitle">
+   <div class="review-action-guide-heading" id="reviewActionGuideTitle">📌 Selanjutnya harus tekan apa?</div>
+   <div class="review-action-guide-next"><span aria-hidden="true">↓</span> Jika data sudah benar, lanjutkan ke tombol biru “Kirim ke WhatsApp Admin”.</div>
+   <ol>
+    <li><b>Periksa data</b> di atas, terutama email, tanggal, paket, perangkat, dan profil.</li>
+    <li>Jika ada yang salah, tekan <b>Ubah data</b> untuk kembali memperbaiki formulir.</li>
+    <li>Jika semua sudah benar, tekan <b>Kirim ke WhatsApp Admin</b>. WhatsApp akan terbuka dengan pesan yang sudah disiapkan.</li>
+    <li>Di WhatsApp, periksa kembali pesannya lalu tekan tombol <b>Kirim</b> agar admin benar-benar menerima data.</li>
+   </ol>
+   <p><b>Salin format</b> adalah pilihan cadangan jika WhatsApp tidak terbuka atau kamu ingin mengirimnya secara manual.</p>
+  </section>
+  <div class="actions">
+   <button class="btn secondary" id="editBtn" type="button">Ubah data</button>
+   <button class="btn secondary" id="copyBtn" type="button">Salin format</button>
+   <button class="btn primary" id="sendBtn" type="button">Kirim ke WhatsApp Admin</button>
+  </div>
+ </section>
+</main>
+<nav class="bottom-nav" id="bottomNav" aria-label="Navigasi utama">
+ <button type="button" class="bottom-nav-item active" data-tab="home" aria-current="page"><span class="bottom-nav-icon">⌂</span><small>Beranda</small></button>
+ <button type="button" class="bottom-nav-item" data-tab="monitoring"><span class="bottom-nav-icon">▤</span><small>Monitoring</small></button>
+ <button type="button" class="bottom-nav-item" data-tab="reminder"><span class="bottom-nav-icon">◷</span><small>Masa Aktif</small></button>
+ <button type="button" class="bottom-nav-item" data-tab="more"><span class="bottom-nav-icon">•••</span><small>Lainnya</small></button>
+</nav>
+
+<div id="expiryAlertOverlay" role="presentation" aria-hidden="true">
+ <section id="expiryAlertDialog" role="dialog" aria-modal="true" aria-labelledby="expiryAlertTitle" aria-describedby="expiryAlertLead">
+  <button id="expiryAlertClose" type="button" aria-label="Tutup peringatan">×</button>
+  <div class="alert-kicker">PENTING · PERINGATAN MASA AKTIF</div>
+  <div class="alert-symbol" aria-hidden="true">⏰</div>
+  <h2 id="expiryAlertTitle">Masa Aktif Segera Berakhir!</h2>
+  <p id="expiryAlertLead">Periksa paket yang perlu diperpanjang.</p>
+  <div id="expiryAlertItems"></div>
+  <div id="expiryAlertAdvice">Jangan sampai masa aktif akun terputus. Hubungi admin jika ingin memperpanjang paket.</div>
+  <div id="expiryAlertActions">
+   <button id="expiryAlertRenew" type="button">Pilih Paket Perpanjangan</button>
+   <button id="expiryAlertRead" type="button">Tandai Sudah Dibaca</button>
+  </div>
+  <div id="expiryAlertFoot">Tandai Sudah Dibaca menyembunyikan popup selama 1 jam. Setelah itu, pengingat akan muncul kembali jika paket masih perlu diperhatikan. Kamu juga bisa membukanya kapan saja dari bagian Pengingat Masa Aktif di beranda.</div>
+ </section>
+</div>
+
+
+<div id="renewalOverlay" class="renewal-overlay" aria-hidden="true">
+ <section class="renewal-dialog" role="dialog" aria-modal="true" aria-labelledby="renewalTitle">
+  <button type="button" class="renewal-x" id="renewalClose" aria-label="Tutup">×</button>
+  <div class="renewal-progress" aria-label="Tahap perpanjangan">
+   <div class="renewal-progress-step active" id="renewalProgress1"><span>1</span><small>Pilih Akun</small></div><i></i>
+   <div class="renewal-progress-step" id="renewalProgress2"><span>2</span><small>Pilih Paket</small></div><i></i>
+   <div class="renewal-progress-step" id="renewalProgress3"><span>3</span><small>Pembayaran</small></div>
+  </div>
+  <div class="renewal-step" id="renewalStepAccount">
+   <div class="renewal-kicker">RAZH STORE · PERPANJANGAN</div>
+   <h2 id="renewalTitle">Pilih Akun</h2>
+   <p class="renewal-sub">Pilih satu akun yang ingin diperpanjang. Periksa email, profil, dan tanggal kedaluwarsanya.</p>
+   <div id="renewalAccountCards" class="renewal-account-cards"></div>
+   <button type="button" class="renewal-primary" id="renewalAccountNext" disabled>Berikutnya · Pilih Paket</button>
+  </div>
+  <div class="renewal-step" id="renewalStepPackage" hidden>
+   <div class="renewal-kicker">RAZH STORE · PERPANJANGAN</div>
+   <h2>Pilih Paket</h2>
+   <p class="renewal-sub" id="renewalPackageSubtitle">Paket mengikuti jenis akun yang dipilih.</p>
+   <div id="renewalSelectedAccount" class="renewal-info"></div>
+   <div class="renewal-label">Pilih durasi perpanjangan</div>
+   <div id="renewalPackages" class="renewal-packages"></div>
+   <div class="renewal-total" id="renewalTotal">Pilih paket terlebih dahulu</div>
+   <button type="button" class="renewal-primary" id="renewalPackageNext" disabled>Berikutnya · Periksa Pesanan</button>
+   <button type="button" class="renewal-secondary" id="renewalPackageBack">Kembali Pilih Akun</button>
+  </div>
+  <div class="renewal-step" id="renewalStepCheckout" hidden>
+   <div class="renewal-kicker">RINGKASAN & PEMBAYARAN</div>
+   <h2>Periksa Pesanan</h2>
+   <p class="renewal-sub">Pastikan akun, paket, dan tanggal perpanjangan sudah benar sebelum membayar.</p>
+   <div id="renewalConfirmInfo" class="renewal-info"></div>
+   <div class="renewal-note">Tanggal baru dihitung dari tanggal kedaluwarsa lama jika akun masih aktif. Jika sudah kedaluwarsa, perhitungan dimulai dari tanggal hari ini. Masa aktif baru hanya diterapkan setelah admin memeriksa dan menyetujui pembayaran.</div>
+   <div class="renewal-pay-amount" id="renewalPayAmount"></div>
+   <img class="renewal-qris" id="renewalQrisImage" src="qris-razh.png" alt="Poster QRIS RAZH Store" />
+   <ol class="renewal-instructions"><li>Buka aplikasi m-banking atau e-wallet.</li><li>Pilih Scan QRIS dan pindai kode pada poster.</li><li>Pastikan nama merchant dan nominal sesuai.</li><li>Selesaikan pembayaran lalu screenshot bukti transaksi.</li></ol>
+   <div class="renewal-note"><strong>Penting:</strong> Pesanan belum diperpanjang otomatis. Admin akan memeriksa bukti pembayaran dan menyetujui perpanjangan secara manual.</div>
+   <button type="button" class="renewal-primary" id="renewalSendAdmin">Kirim Data & Bukti ke Admin WhatsApp</button>
+   <button type="button" class="renewal-secondary" id="renewalCheckoutBack">Kembali Pilih Paket</button>
+   <p class="renewal-sub">Setelah WhatsApp terbuka, lampirkan screenshot bukti pembayaran secara manual sebelum mengirim pesan.</p>
+  </div>
+ </section>
+</div>
+<style>
+.renewal-progress{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 28px 20px}.renewal-progress-step{display:flex;flex-direction:column;align-items:center;gap:5px;color:#98a2b3;min-width:58px}.renewal-progress-step span{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:#eef1f5;color:#667085;font-size:12px;font-weight:900}.renewal-progress-step small{font-size:9px;font-weight:800;white-space:nowrap}.renewal-progress-step.active{color:#2563eb}.renewal-progress-step.active span{background:#2563eb;color:#fff}.renewal-progress>i{height:2px;width:32px;background:#e4e7ec;margin-top:-15px}.renewal-step[hidden]{display:none!important}.renewal-step:not([hidden]){display:block!important}
+.renewal-overlay{position:fixed;inset:0;z-index:10020;background:rgba(8,13,24,.78);display:none;align-items:center;justify-content:center;padding:10px;backdrop-filter:blur(5px)}
+.renewal-overlay.show{display:flex}.renewal-dialog{position:relative;width:min(100%,560px);max-height:94dvh;overflow:auto;background:#fff;border-radius:22px;padding:24px 18px 18px;box-shadow:0 24px 80px #0005;color:#172033}
+.renewal-x{position:absolute;right:12px;top:10px;border:0;border-radius:50%;width:36px;height:36px;font-size:25px;background:#f1f3f6;color:#475467}
+.renewal-kicker{font-size:10px;letter-spacing:1px;font-weight:900;color:#2563eb;text-align:center;margin:0 35px 8px}.renewal-dialog h2{text-align:center;font-size:24px;margin:0 25px 7px}.renewal-sub{text-align:center;color:#667085;font-size:12px;line-height:1.5;margin:6px 0 16px}.renewal-label{display:block;font-size:12px;font-weight:800;margin:13px 0 7px}.renewal-select{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:10px;background:#fff;color:#172033}.renewal-account-cards{display:grid;gap:10px;margin:10px 0 15px}.renewal-account-card{width:100%;border:1px solid #d8dee8;border-radius:14px;background:#fff;padding:13px;text-align:left;color:#172033;cursor:pointer}.renewal-account-card.selected{border:2px solid #2563eb;background:#eff6ff;padding:12px}.renewal-account-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.renewal-account-card .account-email{font-size:14px;font-weight:850;overflow-wrap:anywhere}.renewal-account-card .account-id{font-size:10px;color:#667085;margin-top:3px}.renewal-account-card .account-meta{font-size:12px;color:#667085;line-height:1.6;margin-top:8px}.renewal-account-card .account-expiry{font-size:12px;font-weight:850;margin-top:8px;color:#b45309}.renewal-account-card .account-select-label{display:block;margin-top:10px;padding:8px;border-radius:9px;background:#f2f4f7;text-align:center;font-size:12px;font-weight:850}.renewal-account-card.selected .account-select-label{background:#2563eb;color:#fff}
+.renewal-info{background:#f6f8fb;border:1px solid #e6eaf0;border-radius:12px;padding:12px;margin:12px 0;font-size:12px;line-height:1.7}.renewal-info .rrow{display:flex;justify-content:space-between;gap:12px}.renewal-info .rrow span{color:#667085}.renewal-packages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.renewal-package{border:1px solid #d0d5dd;border-radius:12px;background:#fff;padding:12px;text-align:left;color:#172033;cursor:pointer}.renewal-package.selected{border:2px solid #2563eb;background:#eff6ff;padding:11px}.renewal-package strong{display:block;font-size:15px}.renewal-package .renewal-package-price{font-size:22px;font-weight:950;margin:24px 0 12px}.renewal-package small{display:block;color:#667085;margin-top:4px}.renewal-total{font-size:18px;font-weight:900;text-align:center;margin:15px 0;color:#15803d}.renewal-primary,.renewal-secondary{width:100%;min-height:47px;border-radius:11px;font-weight:850;margin-top:8px;cursor:pointer}.renewal-primary{border:0;background:#2563eb;color:#fff}.renewal-primary:disabled{opacity:.45;cursor:not-allowed}.renewal-secondary{border:1px solid #d0d5dd;background:#fff;color:#344054}.renewal-note{font-size:11px;line-height:1.55;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:11px;border-radius:11px;margin:12px 0}.renewal-pay-amount{text-align:center;font-size:25px;font-weight:950;color:#15803d;margin:12px}.renewal-qris{display:block;width:min(100%,320px);height:auto;margin:10px auto;border:1px solid #e5e7eb;border-radius:12px}.renewal-instructions{font-size:12px;line-height:1.7;padding-left:20px;color:#344054}
+
+/* Panduan visual untuk pengguna baru: CTA lembut, jelas, dan tidak mengganggu. */
+.first-time-guide{display:grid;gap:9px;margin-top:2px}
+.first-time-guide-label{display:flex;align-items:center;gap:8px;padding-left:2px;color:#2563eb;font-size:10px;font-weight:850;letter-spacing:1.05px}
+.first-time-guide-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#2563eb;box-shadow:0 0 0 0 #2563eb55;animation:firstTimeDotPulse 2.6s ease-out infinite}
+.first-time-cta{position:relative;display:flex!important;align-items:center;justify-content:center;gap:10px;overflow:hidden;isolation:isolate;box-shadow:0 5px 16px #2563eb35;animation:firstTimeCtaPulse 3.2s ease-in-out infinite}
+.first-time-cta:before{content:"";position:absolute;z-index:-1;top:-40%;left:-65%;width:42%;height:180%;transform:skewX(-22deg);background:linear-gradient(90deg,transparent,#ffffff35,transparent);animation:firstTimeCtaShine 5.2s ease-in-out infinite}
+.first-time-cta-arrow{font-size:27px;line-height: .7;font-weight:500;transition:transform .2s ease}
+.first-time-cta:hover .first-time-cta-arrow{transform:translateX(4px)}
+@keyframes firstTimeCtaPulse{0%,100%{box-shadow:0 5px 16px #2563eb30;filter:brightness(1)}50%{box-shadow:0 7px 23px #2563eb58;filter:brightness(1.035)}}
+@keyframes firstTimeDotPulse{0%{box-shadow:0 0 0 0 #2563eb55}70%{box-shadow:0 0 0 7px #2563eb00}100%{box-shadow:0 0 0 0 #2563eb00}}
+@keyframes firstTimeCtaShine{0%,62%{left:-65%;opacity:0}70%{opacity:1}88%,100%{left:130%;opacity:0}}
+@media(prefers-reduced-motion:reduce){.first-time-guide-dot,.first-time-cta,.first-time-cta:before{animation:none!important}.first-time-cta-arrow{transition:none}}
+
+
+/* Panduan tindakan pada tahap akhir agar pembeli tahu urutan berikutnya. */
+.review-action-guide{margin:16px 0 13px;padding:15px 15px 13px;border:1px solid #bfdbfe;border-radius:14px;background:#eff6ff;color:#1e3a8a;font-size:13px;line-height:1.6}
+.review-action-guide-heading{font-size:14px;font-weight:850;color:#1d4ed8;margin-bottom:8px}
+.review-action-guide ol{margin:0;padding-left:19px;display:grid;gap:6px}
+.review-action-guide li{padding-left:2px}
+.review-action-guide p{margin:10px 0 0;padding-top:9px;border-top:1px solid #dbeafe;color:#475569;font-size:12px}
+@media(max-width:480px){.review-action-guide{font-size:12px;padding:13px}.review-action-guide-heading{font-size:13px}}
+
+
+/* Animated micro-guides for first-time users on consent and review screens. */
+.intro-step-hint{display:flex;align-items:center;gap:11px;margin:14px 0 17px;padding:12px 13px;border:1px solid #bfdbfe;border-radius:13px;background:#eff6ff;color:#1e3a8a;animation:guideSoftPulse 3.4s ease-in-out infinite}
+.intro-step-hint-icon{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:#dbeafe;color:#2563eb;font-size:23px;font-weight:900;animation:guideArrowDown 1.7s ease-in-out infinite}
+.intro-step-hint div{display:grid;gap:2px}
+.intro-step-hint b{font-size:13px;color:#1d4ed8}
+.intro-step-hint span:not(.intro-step-hint-icon){font-size:12px;line-height:1.5;color:#334155}
+.intro-bottom-hint{display:flex;align-items:center;gap:7px;margin-top:18px;color:#2563eb;font-size:12px;font-weight:800;animation:guideSoftPulse 3.4s ease-in-out infinite}
+.intro-bottom-hint span{font-size:20px;line-height:1;animation:guideArrowDown 1.5s ease-in-out infinite}
+.intro-consent-label{padding:10px 9px;border-radius:10px;background:#f8fafc}
+.review-action-guide-next{display:flex;align-items:center;gap:8px;margin:2px 0 9px;padding:8px 10px;border-radius:9px;background:#dbeafe;color:#1d4ed8;font-size:12px;font-weight:800;animation:guideSoftPulse 3.2s ease-in-out infinite}
+.review-action-guide-next span{font-size:20px;line-height:1;animation:guideArrowDown 1.5s ease-in-out infinite}
+@keyframes guideArrowDown{0%,100%{transform:translateY(-2px)}50%{transform:translateY(4px)}}
+@keyframes guideSoftPulse{0%,100%{box-shadow:0 0 0 0 #3b82f600}50%{box-shadow:0 0 0 4px #3b82f610}}
+@media(max-width:480px){.intro-step-hint{padding:11px}.intro-step-hint span:not(.intro-step-hint-icon){font-size:11px}.intro-bottom-hint{font-size:11px}.review-action-guide-next{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.intro-step-hint,.intro-step-hint-icon,.intro-bottom-hint,.intro-bottom-hint span,.review-action-guide-next,.review-action-guide-next span{animation:none!important}}
+
+</style>
+
+<footer>Pastikan data sesuai dengan perangkat dan paket yang kamu gunakan.<br><br>RAZH adalah layanan monitoring independen milik seller dan tidak berafiliasi dengan Netflix.</footer>
+<script>
+// ADMIN: Isi nomor WhatsApp admin di bawah, gunakan kode negara.
+// Contoh Indonesia: 6281234567890 (tanpa +, spasi, atau 0 di depan).
+const ADMIN_WHATSAPP = "6285177556287";
+
+const $ = id => document.getElementById(id);
+function setDashboardTab(tab,scroll=true){
+ const allowed=["home","monitoring","reminder","more"];if(!allowed.includes(tab))tab="home";
+ $("homeDashboard").dataset.tab=tab;
+ document.querySelectorAll(".bottom-nav-item").forEach(btn=>{
+  const on=btn.dataset.tab===tab;btn.classList.toggle("active",on);
+  if(on)btn.setAttribute("aria-current","page");else btn.removeAttribute("aria-current");
+ });
+ const titles={home:["Pantau masa aktif paket","Ringkasan layanan monitoring RAZH."],monitoring:["Riwayat Monitoring","Cari dan buka catatan pesanan di perangkat ini."],reminder:["Masa Aktif Paket","Pantau paket aktif, segera habis, atau sudah berakhir."],more:["Lainnya","Panduan dan informasi layanan RAZH Monitoring."]};
+ setPageHeading(titles[tab][0],titles[tab][1]);if(scroll)window.scrollTo({top:0,behavior:"smooth"});
+}
+function showDashboard(){ $("homeDashboard").classList.remove("hidden");$("bottomNav").classList.remove("hidden");setDashboardTab("home",false); }
+function hideDashboardNavigation(){ $("bottomNav").classList.add("hidden"); }
+let historyStatusFilter="all";
+function recordWarningWindow(record){
+ const duration=String(record.duration||"").trim();
+ let totalDays;
+ if(duration==="1 Bulan"||duration==="1 Tahun"){
+  const start=dateObj(record.orderDate),end=recordExpiryDate(record);
+  const fallback=duration==="1 Tahun"?365:30;
+  totalDays=start&&end?Math.max(1,Math.round((dateOnly(end)-dateOnly(start))/86400000)):fallback;
+ }else{
+  totalDays=parseInt(duration,10);
+ }
+ if(!Number.isFinite(totalDays)||totalDays<1)totalDays=30;
+ if(totalDays<=2)return 0;
+ if(totalDays<=7)return 1;
+ if(totalDays<=30)return 3;
+ return 7;
+}
+function recordDaysRemaining(record){
+ const expiry=recordExpiryDate(record);if(!expiry)return null;
+ return Math.round((dateOnly(expiry)-dateOnly(new Date()))/86400000);
+}
+function recordStatus(record){
+ const days=recordDaysRemaining(record);if(days===null)return "unknown";
+ if(days<0)return "expired";
+ return days<=recordWarningWindow(record)?"soon":"active";
+}
+function buildMonitoringFormat(record){
+ if(record.message)return String(record.message);
+ const orderId=record.orderId||record.cloudId||record.id||"-";
+ return [
+  "🎬 FORMAT MONITORING",
+  `ID Order: ${orderId}`,
+  `Tanggal Order: ${record.orderDate?fmtDate(record.orderDate):"-"}`,
+  `Tanggal habis: ${record.expiry||"-"}`,
+  `No WA: ${record.buyerWA||"-"}`,
+  `Tanggal Login: ${record.loginDate?fmtDate(record.loginDate):"-"}`,
+  `Jam Login: ${record.loginTime||"-"} ${record.timezone||"WIB"}`,
+  `Device: ${record.device||"-"}`,
+  `Profil: ${record.profile||"-"}`,
+  `Durasi: ${record.duration||"-"}`,
+  `Jenis Akun: ${record.accountType||"-"}`,
+  `Email Akun: ${record.email||"-"}`
+ ].join("\n");
+}
+function openHistoryStatus(status){
+ historyStatusFilter=status||"all";
+ setDashboardTab("monitoring");
+ if($("historySearch"))$("historySearch").value="";
+ renderHistory();
+}
+const todayISO = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+function generateOrderId(){
+ const now=new Date();
+ const datePart=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}`;
+ const randomPart=String(Math.floor(Math.random()*10000)).padStart(4,"0");
+ return `RZH-${datePart}${randomPart}`;
+}
+const data = {accountType:"",duration:"",customDurationDays:"",email:"",customEmail:"",orderDate:todayISO(),loginDate:todayISO(),loginTime:"",loginTimezone:"WIB",customTimezone:"",device:"",profile:"",customProfile:"",buyerWA:"",cloudId:""};
+let steps = [];
+let index = 0;
+let message = "";
+
+function dateObj(v){if(!v)return null;const [y,m,d]=v.split("-").map(Number);return new Date(y,m-1,d)}
+function fmtDate(v){const d=dateObj(v);return d?d.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}):"-"}
+function endDate(){
+ const d=dateObj(data.orderDate);if(!d||!data.duration)return "";
+ if(data.duration==="1 Bulan"){const day=d.getDate(),month=d.getMonth()+1,last=new Date(d.getFullYear(),month+1,0).getDate();return new Date(d.getFullYear(),month,Math.min(day,last))}
+ if(data.duration==="1 Tahun"){const day=d.getDate(),month=d.getMonth(),last=new Date(d.getFullYear()+1,month+1,0).getDate();return new Date(d.getFullYear()+1,month,Math.min(day,last))}
+ const days=parseInt(data.duration,10);d.setDate(d.getDate()+days);return d;
+}
+function calculateExpiry(dateValue){
+ const d=dateObj(dateValue);if(!d||!data.duration)return null;
+ if(data.duration==="1 Bulan"){
+  const day=d.getDate(),month=d.getMonth()+1,last=new Date(d.getFullYear(),month+1,0).getDate();
+  return new Date(d.getFullYear(),month,Math.min(day,last));
+ }
+ if(data.duration==="1 Tahun"){
+  const day=d.getDate(),month=d.getMonth(),last=new Date(d.getFullYear()+1,month+1,0).getDate();
+  return new Date(d.getFullYear()+1,month,Math.min(day,last));
+ }
+ d.setDate(d.getDate()+parseInt(data.duration,10));
+ return d;
+}
+function expiryText(){
+ const d=calculateExpiry(data.orderDate);
+ return d?d.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}):"-";
+}
+function buildSteps(){
+ steps=[
+  {key:"accountType",title:"Pilih jenis akun",sub:"Pilih jenis paket Netflix yang kamu beli.",type:"select",options:[["Sharing (1P2U)","Sharing — 1P2U"],["Semi Private","Semi Private"]]},
+  {key:"duration",title:"Pilih durasi paket",sub:"Pilih durasi yang tersedia atau pilih Custom untuk mengisi jumlah hari sendiri.",type:"select",options:data.accountType==="Semi Private"?[["7 Hari","7 Hari"],["1 Bulan","1 Bulan"],["1 Tahun","1 Tahun"],["Custom","Custom — isi sendiri"]]:[["1 Hari","1 Hari"],["2 Hari","2 Hari"],["3 Hari","3 Hari"],["5 Hari","5 Hari"],["7 Hari","7 Hari"],["1 Bulan","1 Bulan"],["1 Tahun","1 Tahun"],["Custom","Custom — isi sendiri"]]},
+  ...(data.duration==="Custom"?[{key:"customDurationDays",title:"Masukkan durasi custom",sub:"Isi jumlah hari masa aktif paket (1–365 hari). Contoh: 10.",type:"number",placeholder:"Jumlah hari",min:1,max:365}]:[]),
+  {key:"email",title:"Pilih email akun",sub:"Pilih email yang diberikan seller. Jika tidak ada di daftar, pilih Lainnya.",type:"select",options:data.accountType==="Semi Private"?[["razhh.netflix5@gmail.com","razhh.netflix5@gmail.com"],["Lainnya","Lainnya (isi sendiri)"]]:[["razh.netflix@gmail.com","razh.netflix@gmail.com"],["razhh.netflix3@gmail.com","razhh.netflix3@gmail.com"],["razhh.netflix5@gmail.com","razhh.netflix5@gmail.com"],["Lainnya","Lainnya (isi sendiri)"]]},
+ ];
+ if(data.email==="Lainnya") steps.push({key:"customEmail",title:"Masukkan email akun",sub:"Ketik alamat email akun yang diberikan seller.",type:"email",placeholder:"contoh@email.com"});
+ steps.push(
+  {key:"orderDate",title:"Tanggal order",sub:"Masukkan tanggal kamu melakukan pemesanan.",type:"date"},
+  {key:"loginDate",title:"Tanggal login",sub:"Masukkan tanggal pertama kali login ke akun.",type:"date"},
+  {key:"loginTime",title:"Jam login",sub:"Masukkan jam saat pertama kali login. Jika keyboard iPhone tidak menyediakan tanda titik atau titik dua, cukup ketik 4 angka. Contoh: 1848 akan dibaca sebagai 18.48. Jangan menggunakan perkiraan.",type:"text",placeholder:"Contoh: 22.22 atau 2222"},
+  {key:"loginTimezone",title:"Zona waktu saat login",sub:"Pilih zona waktu sesuai lokasi kamu ketika login. Jika berada di negara atau zona waktu lain, pilih opsi paling bawah.",type:"select",options:[["WIB","WIB — Waktu Indonesia Barat (UTC+7)"],["WITA","WITA — Waktu Indonesia Tengah (UTC+8)"],["WIT","WIT — Waktu Indonesia Timur (UTC+9)"],["JST","JST — Waktu Jepang (UTC+9)"],["Lainnya","Lainnya — isi sendiri"]]},
+  ...(data.loginTimezone==="Lainnya"?[{key:"customTimezone",title:"Tulis zona waktu kamu",sub:"Tuliskan singkatan zona waktu dan offset UTC, atau nama kota/negara. Contoh: CET (UTC+1), EST (UTC−5), atau London (GMT/BST).",type:"text",placeholder:"Contoh: CET (UTC+1)"}]:[]),
+  {key:"device",title:"Perangkat yang digunakan",sub:"Tuliskan merek dan tipe perangkat, bukan hanya jenisnya.",type:"text",placeholder:"Contoh: Samsung A15"},
+  {key:"profile",title:"Pilih profil Netflix",sub:"Pilih profil yang diberikan seller. Jika nama profil berbeda, pilih Lainnya.",type:"select",options:[["#razh - 1","#razh - 1"],["#razh - 2","#razh - 2"],["#razh - 3","#razh - 3"],["#razh - 4","#razh - 4"],["#razh - 5","#razh - 5"],["Lainnya","Lainnya (isi sendiri)"]]},
+ );
+ if(data.profile==="Lainnya") steps.push({key:"customProfile",title:"Masukkan nama profil",sub:"Tuliskan nama profil sesuai yang diberikan seller.",type:"text",placeholder:"Contoh: Profil keluarga"});
+ steps.push({key:"buyerWA",title:"Nomor WhatsApp kamu",sub:"Bagian ini opsional, tetapi disarankan agar admin mudah menghubungimu.",type:"tel",optional:true,placeholder:"Contoh: 081234567890"});
+}
+function renderStep(){
+ setPageHeading("Isi data monitoring", "Isi satu per satu. Setelah semua lengkap, periksa kembali sebelum mengirim ke admin.");
+ buildSteps();
+ if(index>=steps.length){showReview();return}
+ const s=steps[index],area=$("fieldArea");
+ $("stepKicker").textContent=`LANGKAH ${String(index+1).padStart(2,"0")}`;
+ $("question").textContent=s.title;
+ $("sub").textContent=s.sub;
+ $("progressLabel").textContent="PENGISIAN DATA";
+ $("progressCount").textContent=`${index+1} dari ${steps.length}`;
+ $("progressBar").style.width=`${((index+1)/steps.length)*100}%`;
+ $("backBtn").classList.toggle("hidden",index===0);
+ $("nextBtn").textContent=s.optional?"Lewati / Lanjutkan":"Lanjutkan";
+ $("errorBox").style.display="none";
+ area.innerHTML="";
+ const wrap=document.createElement("div");wrap.className="field";
+ const label=document.createElement("label");label.htmlFor="currentInput";label.textContent=s.title+(s.optional?" (opsional)":"");wrap.appendChild(label);
+ let el;
+ if(s.type==="select"){
+  el=document.createElement("select");const empty=document.createElement("option");empty.value="";empty.textContent="Pilih salah satu";el.appendChild(empty);
+  s.options.forEach(([value,text])=>{const o=document.createElement("option");o.value=value;o.textContent=text;el.appendChild(o)});
+ }else{
+  el=document.createElement("input");el.type=s.type;el.placeholder=s.placeholder||"";
+  if(s.type==="date" && !data[s.key]) el.value=todayISO();
+  if(s.type==="number"){el.min=String(s.min||1);el.max=String(s.max||365);el.step="1";el.inputMode="numeric";}
+  if(s.type==="email") el.autocomplete="email";
+  if(s.type==="tel") el.inputMode="tel";
+ }
+ el.id="currentInput";el.value=data[s.key]||el.value||"";
+ if(s.type==="date"){
+  el.max=todayISO();
+  if(s.key==="loginDate" && data.orderDate) el.min=data.orderDate;
+ }
+ el.required=!s.optional;
+ wrap.appendChild(el);
+ if(s.key==="orderDate"){
+  const calc=document.createElement("div");
+  calc.id="expiryCalculator";
+  calc.style.cssText="margin-top:12px;padding:13px;border:1px solid #d9eee1;background:#f5fff8;border-radius:12px";
+  const updateCalc=()=>{
+   const d=calculateExpiry(el.value);
+   calc.innerHTML=d
+    ? `<div style="font-size:11px;color:#55735f;font-weight:750">KALKULATOR TANGGAL HABIS</div><div style="font-size:12px;color:#55735f;margin-top:5px">Tanggal mulai paket: <b>${escapeHTML(fmtDate(el.value))}</b></div><div style="font-size:16px;color:#176b3d;font-weight:850;margin-top:4px">Tanggal habis: ${escapeHTML(d.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}))}</div><div style="font-size:11px;color:#55735f;margin-top:4px">Dihitung dari tanggal order + durasi ${escapeHTML(data.duration)}.</div>`
+    : `<div style="font-size:12px;color:#755018">Pilih tanggal order untuk menghitung tanggal habis.</div>`;
+  };
+  updateCalc();
+  el.addEventListener("input",updateCalc);
+  wrap.appendChild(calc);
+  const hint=document.createElement("p");hint.className="hint";hint.textContent="Tanggal mulai paket mengikuti tanggal order. Tanggal login dicatat terpisah dan tidak mengubah perhitungan tanggal habis.";wrap.appendChild(hint);
+ }
+ if(s.key==="loginTime"){
+  // Numeric keypad is available on iPhone; four digits (HHMM) are accepted
+  // so users do not need a colon or period key.
+  el.setAttribute("inputmode","numeric");
+  el.setAttribute("pattern","[0-9:.]*");
+  el.setAttribute("maxlength","5");
+  el.setAttribute("autocomplete","off");
+  const hint=document.createElement("p");
+  hint.className="hint";
+  hint.textContent="Pakai iPhone? Ketik 4 angka saja, misalnya 1848. Sistem akan membacanya sebagai 18:48.";
+  wrap.appendChild(hint);
+ }
+ if(s.optional){const hint=document.createElement("div");hint.className="optional";hint.textContent="Boleh dikosongkan. Tekan “Lewati / Lanjutkan” jika tidak ingin mengisi nomor WhatsApp.";wrap.appendChild(hint)}
+ if(s.key==="orderDate"||s.key==="loginDate"){const h=document.createElement("p");h.className="hint";h.textContent="Contoh: pilih tanggal dari kalender.";wrap.appendChild(h)}
+ area.appendChild(wrap);
+ el.focus();
+}
+function setError(t){$("errorBox").textContent=t;$("errorBox").style.display="block"}
+function advance(){
+ const s=steps[index],el=$("currentInput"),v=el.value.trim();
+ if(!s.optional&&!v){setError("Kolom ini wajib diisi sebelum lanjut.");el.focus();return}
+ if(s.key==="customEmail"&&v&&!el.checkValidity()){setError("Format email belum valid. Periksa kembali.");el.focus();return}
+ if(s.key==="customDurationDays"){
+  const days=Number(v);
+  if(!Number.isInteger(days)||days<1||days>365){setError("Masukkan durasi berupa bilangan bulat 1 sampai 365 hari.");el.focus();return}
+  data.customDurationDays=String(days);
+  data.duration=`${days} Hari`;
+ }
+ if(s.key==="customTimezone" && !v){setError("Tuliskan zona waktu kamu, misalnya CET (UTC+1) atau London (GMT/BST).");el.focus();return}
+ let valueToSave=v;
+ if(s.key==="loginTime"){
+  // Terima HHMM, HH:MM, atau HH.MM; simpan selalu sebagai HH.MM.
+  let normalized=v.trim().replace(":",".");
+  if(/^\d{4}$/.test(normalized)){
+   normalized=normalized.slice(0,2)+"."+normalized.slice(2);
+  }
+  if(!/^([01]\d|2[0-3])\.[0-5]\d$/.test(normalized)){
+   setError("Masukkan jam yang benar. Ketik 4 angka (contoh 2222) atau format 22.22.");
+   el.focus();return;
+  }
+  valueToSave=normalized;
+ }
+ if((s.key==="orderDate" || s.key==="loginDate") && v>todayISO()){
+  setError("Tanggal tidak boleh melebihi tanggal hari ini.");el.focus();return;
+ }
+ if(s.key==="loginDate" && data.orderDate && v<data.orderDate){
+  setError("Tanggal login tidak boleh lebih awal dari tanggal order.");el.focus();return;
+ }
+ if(s.key==="buyerWA" && v){
+  const digits=v.replace(/\D/g,"");
+  if(digits.length<8 || digits.length>15){
+   setError("Nomor WhatsApp harus berisi 8–15 angka. Periksa kembali.");el.focus();return;
+  }
+ }
+ if(s.key==="email"&&v==="Lainnya"){data.customEmail=""}
+ if(s.key==="profile"&&v==="Lainnya"){data.customProfile=""}
+ data[s.key]=valueToSave;
+ if(s.key==="accountType"){data.duration="";data.email="";data.customEmail=""}
+ if(s.key==="email"&&v!=="Lainnya")data.customEmail="";
+ if(s.key==="profile"&&v!=="Lainnya")data.customProfile="";
+ if(s.key==="loginTimezone"&&v!=="Lainnya")data.customTimezone="";
+ index++;
+ buildSteps();
+ if(index>=steps.length)showReview();else renderStep();
+}
+function emailValue(){return data.email==="Lainnya"?data.customEmail:data.email}
+function profileValue(){return data.profile==="Lainnya"?data.customProfile:data.profile}
+function createMessage(){
+ return `> *KESALAHAN PADA SAAT MENGISI FORMAT BISA BERAKIBAT FATAL* ‼️
+> DI TUNGGU *MAKS 3 JAM*
+> GA DI ISI? \`KICK LANGSUNG\`‼️
+> *DILARANG KERAS MENAMBAH / MENGHUBUNGKAN PERANGKAT APAPUN TANPA IZIN.* KETAHUAN? \`DENDA\` ‼️
+> DATA PERANGKAT AKAN DICOCOKKAN DENGAN INFORMASI YANG KAMU ISI. JIKA TIDAK SESUAI, ADMIN DAPAT MEMINTA VERIFIKASI ULANG.
+> DIMOHON BACA SYARAT & KETENTUAN NETFLIX NYA YAA (BANYAKIN LITERASI, IZIIIN..)
+
+> \`SIMPAN FORMAT INI JANGAN SAMPE HILANG\` KARENA AKAN DIMINTA PADA SAAT KLAIM GARANSI / JIKA TERJADI KENDALA. *HILANG?* \`RESIKO TANGGUNG SENDIRI / TIDAK DILAYANI,\` KARENA TERMASUK KESALAHAN PEMBELI
+┏━━━━━━━━━━━━━┓
+   🎬 *FORMAT MONITORING*
+┗━━━━━━━━━━━━━┛
+▣ ID Order: ${data.cloudId||"-"}
+▣ Tanggal Order: ${fmtDate(data.orderDate)}
+▣ Tanggal habis: ${expiryText()}
+▣ No WA: ${data.buyerWA||"-"}
+▣ Tanggal Login: ${fmtDate(data.loginDate)}
+▣ Jam Login: ${data.loginTime} ${data.loginTimezone==="Lainnya"?data.customTimezone:data.loginTimezone}
+▣ Device: ${data.device}
+▣ Profil: ${profileValue()}
+▣ Durasi: ${data.duration}
+▣ Jenis Akun: ${data.accountType}
+▣ Email Akun: ${emailValue()}
+━━━━━━━━━━━━━━━`;
+}
+const HISTORY_KEY = "razhNetflixMonitoringHistory_v1";
+function getHistory(){
+ try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")}catch(e){return []}
+}
+function saveHistory(){
+ const records=getHistory();
+ const recordId=data.cloudId || `${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+ const record={
+  id:recordId,
+  orderId:data.cloudId||recordId,
+  savedAt:new Date().toISOString(),
+  accountType:data.accountType,duration:data.duration,email:emailValue(),
+  orderDate:data.orderDate,expiry:expiryText(),loginDate:data.loginDate,
+  loginTime:data.loginTime,timezone:data.loginTimezone==="Lainnya"?data.customTimezone:data.loginTimezone,
+  device:data.device,profile:profileValue(),buyerWA:data.buyerWA||"",
+  message:message
+ };
+ const existingIndex=records.findIndex(item=>item.id===recordId);
+ if(existingIndex>=0) records.splice(existingIndex,1);
+ records.unshift(record);
+ try{localStorage.setItem(HISTORY_KEY,JSON.stringify(records.slice(0,200)))}catch(e){
+  alert("Penyimpanan riwayat browser penuh atau tidak tersedia. Salin format untuk menyimpan cadangan.");
+ }
+ renderHistory();
+}
+function recordExpiryDate(r){
+ const d=dateObj(r.orderDate);if(!d||!r.duration)return null;
+ if(r.duration==="1 Bulan"){
+  const day=d.getDate(),month=d.getMonth()+1,last=new Date(d.getFullYear(),month+1,0).getDate();
+  return new Date(d.getFullYear(),month,Math.min(day,last));
+ }
+ if(r.duration==="1 Tahun"){
+  const day=d.getDate(),month=d.getMonth(),last=new Date(d.getFullYear()+1,month+1,0).getDate();
+  return new Date(d.getFullYear()+1,month,Math.min(day,last));
+ }
+ d.setDate(d.getDate()+parseInt(r.duration,10));
+ return d;
+}
+function dateOnly(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function renderReminders(){
+ const host=$("reminderList");if(!host)return;
+ const records=getHistory();host.innerHTML="";
+ if(!records.length){host.innerHTML='<div class="hint">Belum ada paket tersimpan. Pengingat akan muncul setelah kamu menyelesaikan pengisian formulir.</div>';return}
+ const today=dateOnly(new Date());
+ const sorted=records.map(r=>{
+  const expiry=recordExpiryDate(r);
+  const days=expiry?Math.round((dateOnly(expiry)-today)/86400000):null;
+  return {r,expiry,days};
+ }).sort((a,b)=>(a.days??99999)-(b.days??99999));
+ sorted.forEach(({r,expiry,days})=>{
+  const item=document.createElement("div");item.className="reminder-item";
+  const head=document.createElement("div");head.className="reminder-head";
+  const left=document.createElement("div");
+  const title=document.createElement("strong");title.textContent=r.email||"Email tidak tersedia";
+  const meta=document.createElement("div");meta.className="reminder-date";meta.textContent=`${r.profile||"-"} · ${r.duration||"-"} · Habis: ${expiry?expiry.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}):r.expiry||"-"}`;
+  left.append(title,meta);head.appendChild(left);item.appendChild(head);
+  const status=document.createElement("div");status.className="reminder-status";
+  if(days===null){status.textContent="Tanggal tidak tersedia"}
+  else if(days<0){status.classList.add("expired");status.textContent=`Sudah habis ${Math.abs(days)} hari lalu`}
+  else if(days===0){status.classList.add("today");status.textContent="Berakhir hari ini"}
+  else if(days<=recordWarningWindow(r)){status.classList.add("soon");status.textContent=`Segera habis · ${days} hari lagi`}
+  else{status.textContent=`Tersisa ${days} hari · Masih aktif`}
+  item.appendChild(status);
+  const actions=document.createElement("div");actions.className="reminder-actions";
+  const detail=document.createElement("button");detail.type="button";detail.className="btn reminder-detail-toggle";detail.textContent="⌄  Lihat Detail Pesanan";
+  const detailPanel=document.createElement("div");detailPanel.className="reminder-detail-panel";detailPanel.hidden=true;
+  const detailTitle=document.createElement("div");detailTitle.className="reminder-detail-title";detailTitle.textContent="RINCIAN PESANAN";
+  const grid=document.createElement("div");grid.className="reminder-detail-grid";
+  const detailRows=[
+   ["Jenis akun",r.accountType||"-"],["Durasi",r.duration||"-"],
+   ["Tanggal order",r.orderDate?fmtDate(r.orderDate):"-"],["Tanggal login",r.loginDate?fmtDate(r.loginDate):"-"],
+   ["Jam login",r.loginTime?`${r.loginTime} ${r.timezone||""}`.trim():"-"],["Perangkat",r.device||"-"],
+   ["Profil",r.profile||"-"],["Nomor WhatsApp",r.buyerWA||"-"],
+   ["Tanggal habis",expiry?fmtDateObj(expiry):r.expiry||"-"]
+  ];
+  detailRows.forEach(([label,value])=>{
+   const cell=document.createElement("div");cell.className="reminder-detail-cell";
+   const caption=document.createElement("span");caption.textContent=label;
+   const strong=document.createElement("strong");strong.textContent=value;
+   cell.append(caption,strong);grid.appendChild(cell);
+  });
+  const orderRow=document.createElement("div");orderRow.className="reminder-detail-order";
+  const orderCode=document.createElement("code");const orderId=String(r.orderId||r.cloudId||r.id||"-");orderCode.textContent=orderId;
+  const copyId=document.createElement("button");copyId.type="button";copyId.className="btn secondary";copyId.textContent="Salin ID";
+  copyId.addEventListener("click",async()=>{
+   try{await navigator.clipboard.writeText(orderId);copyId.textContent="Tersalin ✓"}
+   catch(e){copyId.textContent="Pilih ID";const range=document.createRange();range.selectNodeContents(orderCode);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range)}
+   setTimeout(()=>copyId.textContent="Salin ID",1800);
+  });
+  orderRow.append(orderCode,copyId);
+  detailPanel.append(detailTitle,grid,orderRow);
+  detail.addEventListener("click",()=>{
+   detailPanel.hidden=!detailPanel.hidden;
+   detail.textContent=detailPanel.hidden?"⌄  Lihat Detail Pesanan":"⌃  Tutup Detail Pesanan";
+  });
+  const renew=document.createElement("button");renew.type="button";renew.className="btn primary";renew.textContent="Ajukan Perpanjangan";
+  renew.addEventListener("click",()=>openRenewalFlow([r]));
+  const contact=document.createElement("button");contact.type="button";contact.className="btn secondary";contact.textContent="Hubungi Admin";
+  contact.addEventListener("click",()=>{
+   const msg=`Halo Admin RAZH, saya ingin bertanya tentang paket monitoring saya.\n\nID Order: ${orderId}\nEmail: ${r.email||"-"}\nProfil: ${r.profile||"-"}\nTanggal habis: ${expiry?fmtDateObj(expiry):r.expiry||"-"}\n\nMohon bantu cek. Terima kasih.`;
+   window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank","noopener");
+  });
+  actions.append(detail,renew,contact);item.append(actions,detailPanel);host.appendChild(item);
+ });
+}
+
+function renderHistory(){
+ renderReminders();
+ const list=$("historyList");if(!list)return;
+ const all=getHistory(),q=($("historySearch")?.value||"").trim().toLowerCase();
+ const normalizeOrderSearch=value=>String(value||"").toLowerCase().replace(/^rzh[-\s]*/,"").replace(/[^a-z0-9]/g,"");
+ const qOrder=normalizeOrderSearch(q);
+ const typeFilter=$("historyTypeFilter")?.value||"all";
+ const sortMode=$("historySort")?.value||"newest";
+ const filtered=all.filter(r=>{
+  const orderId=r.orderId||r.cloudId||r.id||"";
+  const fields=[r.email,r.buyerWA,r.profile,r.orderDate,r.device,r.accountType,r.expiry,r.loginDate,r.loginTime,orderId];
+  const textMatch=fields.join(" ").toLowerCase().includes(q);
+  const idMatch=qOrder.length>0&&normalizeOrderSearch(orderId).includes(qOrder);
+  const statusMatch=historyStatusFilter==="all"||recordStatus(r)===historyStatusFilter;
+  const accountType=String(r.accountType||"").toLowerCase();
+  const typeMatch=typeFilter==="all"||accountType.includes(typeFilter.toLowerCase());
+  return statusMatch&&typeMatch&&(!q||textMatch||idMatch);
+ });
+ filtered.sort((a,b)=>{
+  if(sortMode==="oldest")return (Date.parse(a.savedAt)||0)-(Date.parse(b.savedAt)||0);
+  if(sortMode==="expiry-asc"||sortMode==="expiry-desc"){
+   const da=recordExpiryDate(a)?.getTime()??Number.MAX_SAFE_INTEGER;
+   const db=recordExpiryDate(b)?.getTime()??Number.MAX_SAFE_INTEGER;
+   return sortMode==="expiry-asc"?da-db:db-da;
+  }
+  if(sortMode==="email-asc")return String(a.email||"").localeCompare(String(b.email||""),"id");
+  return (Date.parse(b.savedAt)||0)-(Date.parse(a.savedAt)||0);
+ });
+ $("historyCount").textContent=all.length?`${filtered.length} dari ${all.length} riwayat ditemukan`:"Belum ada riwayat tersimpan.";
+ let activeCount=0,soonCount=0,expiredCount=0;
+ all.forEach(record=>{const status=recordStatus(record);if(status==="expired")expiredCount++;else if(status==="soon")soonCount++;else if(status==="active")activeCount++;});
+ if($("dashTotal"))$("dashTotal").textContent=all.length;
+ if($("dashActive"))$("dashActive").textContent=activeCount;
+ if($("dashSoon"))$("dashSoon").textContent=soonCount;
+ if($("dashExpired"))$("dashExpired").textContent=expiredCount;
+ document.querySelectorAll(".history-status-filter").forEach(button=>button.classList.toggle("active",button.dataset.statusFilter===historyStatusFilter));
+ const recentHost=$("dashboardRecentList");
+ if(recentHost){
+  recentHost.innerHTML="";
+  const recent=all.slice().sort((a,b)=>(Date.parse(b.savedAt)||0)-(Date.parse(a.savedAt)||0)).slice(0,3);
+  if(!recent.length){recentHost.innerHTML='<div class="hint">Belum ada riwayat monitoring.</div>';}
+  recent.forEach(record=>{
+   const row=document.createElement("div");row.className="dashboard-recent-row";
+   const left=document.createElement("div");const email=document.createElement("strong");email.textContent=record.email||"Email tidak tersedia";
+   const detail=document.createElement("small");detail.textContent=`${record.profile||"-"} · ${record.orderDate?fmtDate(record.orderDate):"-"}`;
+   left.append(email,detail);const id=document.createElement("span");id.className="dashboard-recent-id";id.textContent=record.orderId||record.cloudId||record.id||"ID tidak tersedia";
+   row.append(left,id);recentHost.appendChild(row);
+  });
+ }
+ list.innerHTML="";
+ if(!filtered.length){
+  const empty=document.createElement("div");empty.className="hint";empty.textContent=all.length?"Tidak ada riwayat yang cocok.":"Riwayat akan muncul setelah formulir selesai dibuat.";list.appendChild(empty);return;
+ }
+ filtered.forEach(r=>{
+  const card=document.createElement("div");card.className="history-item";
+  const top=document.createElement("div");top.className="history-item-top";
+  const title=document.createElement("strong");title.textContent=r.email||"Email tidak tersedia";
+  const date=document.createElement("span");date.className="history-meta";const savedAt=r.savedAt?new Date(r.savedAt):null;
+   date.textContent=savedAt&&!Number.isNaN(savedAt.getTime())?savedAt.toLocaleString("id-ID"):"Tanggal tidak tersedia";
+  top.append(title,date);card.appendChild(top);
+  const orderId=r.orderId||r.cloudId||r.id||"-";
+  const idLine=document.createElement("div");idLine.className="history-id-line";
+  const idBadge=document.createElement("code");idBadge.textContent=orderId;
+  const copyId=document.createElement("button");copyId.type="button";copyId.textContent="Salin ID";
+  copyId.addEventListener("click",async()=>{
+   try{if(!navigator.clipboard||!window.isSecureContext)throw new Error("Clipboard tidak tersedia");await navigator.clipboard.writeText(String(orderId));copyId.textContent="Tersalin ✓";}
+   catch(e){const range=document.createRange();range.selectNodeContents(idBadge);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);copyId.textContent="Pilih ID";}
+   setTimeout(()=>copyId.textContent="Salin ID",1800);
+  });
+  idLine.append(idBadge,copyId);card.appendChild(idLine);
+  const meta=document.createElement("div");meta.className="history-meta";
+  meta.textContent=`${r.profile||"-"} · ${r.device||"-"} · Order ${fmtDate(r.orderDate)} · Habis ${r.expiry||"-"} · ${r.status||"Catatan lokal"}`;
+  card.appendChild(meta);
+  const actions=document.createElement("div");actions.className="history-card-actions";
+  const copy=document.createElement("button");copy.className="btn secondary";copy.type="button";copy.textContent="Salin format";
+  copy.addEventListener("click",async()=>{
+   try{
+    if(!navigator.clipboard || !window.isSecureContext) throw new Error("Clipboard tidak tersedia");
+    await navigator.clipboard.writeText(buildMonitoringFormat(r));
+    copy.textContent="Tersalin ✓";
+    setTimeout(()=>copy.textContent="Salin format",1800);
+   }catch(e){
+    // Jangan membuka tab about:blank. Tampilkan teks langsung di kartu riwayat.
+    let fallback=card.querySelector(".history-copy-fallback");
+    if(!fallback){
+     fallback=document.createElement("div");
+     fallback.className="history-copy-fallback";
+     fallback.style.cssText="margin-top:10px";
+     const tip=document.createElement("p");
+     tip.className="hint";
+     tip.textContent="Browser membatasi salin otomatis. Tekan lama teks di bawah, pilih Semua, lalu Salin.";
+     const area=document.createElement("textarea");
+     area.readOnly=true;
+     area.value=buildMonitoringFormat(r);
+     area.setAttribute("aria-label","Format monitoring untuk disalin");
+     area.style.cssText="width:100%;min-height:210px;padding:11px;border:1px solid #ccc;border-radius:10px;font:12px/1.55 monospace;white-space:pre-wrap;user-select:text;-webkit-user-select:text";
+     fallback.append(tip,area);
+     card.appendChild(fallback);
+    }
+    const area=fallback.querySelector("textarea");
+    area.focus();area.select();area.setSelectionRange(0,area.value.length);
+    fallback.scrollIntoView({behavior:"smooth",block:"center"});
+    copy.textContent="Teks siap disalin";
+   }
+  });
+  const remove=document.createElement("button");remove.className="btn secondary";remove.type="button";remove.textContent="Hapus";
+  remove.addEventListener("click",()=>{if(confirm("Hapus riwayat ini dari perangkat ini?")){try{localStorage.setItem(HISTORY_KEY,JSON.stringify(getHistory().filter(x=>x.id!==r.id)));renderHistory()}catch(e){alert("Riwayat tidak dapat dihapus karena penyimpanan browser tidak tersedia.")}}});
+  actions.append(copy,remove);card.appendChild(actions);list.appendChild(card);
+ });
+}
+function updateLiveClock(){
+ const now=new Date();
+ $("clockTime").textContent=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+ $("clockDate").textContent=now.toLocaleDateString("id-ID",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+}
+$("historySearch").addEventListener("input",renderHistory);
+$("historyTypeFilter").addEventListener("change",renderHistory);
+$("historySort").addEventListener("change",renderHistory);
+$("clearHistorySearch").addEventListener("click",()=>{$("historySearch").value="";renderHistory();$("historySearch").focus()});
+
+const EXPIRY_ALERT_READ_KEY = "razhExpiryAlertReadSignature_v2";
+let currentExpiryAlertSignature = "";
+function closeExpiryAlertForSession(){
+ const overlay=$("expiryAlertOverlay");
+ if(overlay){overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true")}
+}
+function hideExpiryAlertForOneHour(){
+ // Simpan status dibaca untuk daftar pengingat saat ini. Daftar baru/perubahan hari akan memicu pengingat baru.
+ if(currentExpiryAlertSignature){
+  try{localStorage.setItem(EXPIRY_ALERT_READ_KEY,JSON.stringify({
+    signature:currentExpiryAlertSignature,
+    readAt:Date.now()
+   }))}catch(e){
+   console.warn("Status baca pengingat tidak dapat disimpan di browser:",e);
+  }
+ }
+ closeExpiryAlertForSession();
+}
+function showExpiryAlertIfNeeded(forceOpen=false){
+ const overlay=$("expiryAlertOverlay"),itemsHost=$("expiryAlertItems");
+ if(!overlay||!itemsHost)return;
+ const today=dateOnly(new Date());
+ const due=getHistory().map(r=>({r,expiry:recordExpiryDate(r)}))
+  .filter(x=>x.expiry)
+  .map(x=>({...x,days:Math.round((dateOnly(x.expiry)-today)/86400000)}))
+  .filter(x=>x.days<0||x.days<=recordWarningWindow(x.r));
+ if(!due.length){
+  currentExpiryAlertSignature="";
+  return;
+ }
+ due.sort((a,b)=>a.days-b.days);
+ // Signature berubah jika ada akun baru/berubah atau status hari masa aktif berubah.
+ currentExpiryAlertSignature=due.map(x=>`${String(x.r.id||"")}:${x.expiry.getFullYear()}-${x.expiry.getMonth()+1}-${x.expiry.getDate()}:${x.days}`).join("|");
+ let readState=null;
+ try{
+  const saved=localStorage.getItem(EXPIRY_ALERT_READ_KEY);
+  readState=saved?JSON.parse(saved):null;
+ }catch(e){}
+ const oneHour=60*60*1000;
+ const alreadyRead=readState &&
+  readState.signature===currentExpiryAlertSignature &&
+  Number.isFinite(readState.readAt) &&
+  Date.now()-readState.readAt<oneHour;
+ if(!forceOpen && alreadyRead)return;
+ itemsHost.innerHTML="";
+ due.forEach(({r,expiry,days})=>{
+  const card=document.createElement("div");card.className="expiry-alert-item";
+  const title=document.createElement("strong");title.textContent=r.email||"Email akun tidak tersedia";
+  const meta=document.createElement("div");meta.className="expiry-alert-meta";meta.textContent=`${r.profile||"Profil tidak disebutkan"} · ${r.duration||"Paket"} · Berakhir ${expiry.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})}`;
+  const status=document.createElement("div");status.className="expiry-alert-status";
+  status.textContent=days<0?`SUDAH BERAKHIR ${Math.abs(days)} HARI LALU`:days===0?"HARI TERAKHIR · H-0":`TERSISA ${days} HARI · H-${days}`;
+  card.append(title,meta,status);itemsHost.appendChild(card);
+ });
+ $("expiryAlertLead").textContent=due.length===1?"Masa aktif salah satu paket kamu hampir habis.":`${due.length} paket kamu perlu diperhatikan masa aktifnya.`;
+ $("expiryAlertTitle").textContent=due.some(x=>x.days<0)?"Ada Paket yang Sudah Berakhir!":"Masa Aktif Segera Berakhir!";
+ $("expiryAlertRenew").onclick=()=>{closeExpiryAlertForSession();openRenewalFlow(due.map(x=>x.r));};
+ overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");
+};
+$("expiryAlertClose")?.addEventListener("click",closeExpiryAlertForSession);
+$("expiryAlertRead")?.addEventListener("click",hideExpiryAlertForOneHour);
+$("openExpiryAlertBtn")?.addEventListener("click",()=>showExpiryAlertIfNeeded(true));
+$("expiryAlertOverlay")?.addEventListener("click",e=>{if(e.target.id==="expiryAlertOverlay")closeExpiryAlertForSession()});
+
+
+// RAZH renewal checkout: one account per transaction, manual admin approval.
+const RENEWAL_PRICES={
+ "Sharing":[["1 Hari",2500,"1P2U"],["2 Hari",4500,"1P2U"],["3 Hari",5500,"1P2U"],["5 Hari",7000,"1P2U"],["7 Hari",8000,"1P2U"],["1 Bulan",15000,"1P2U"]],
+ "Semi Private":[["7 Hari",12000,"Semi Private"],["1 Bulan",29000,"Semi Private"]]
+};
+let renewalAccount=null,renewalPackage=null,renewalNewExpiry=null;
+function rupiah(n){return "Rp"+Number(n).toLocaleString("id-ID")}
+function addRenewalDuration(start,duration){
+ const d=new Date(start.getFullYear(),start.getMonth(),start.getDate());
+ if(duration==="1 Bulan"){
+  const day=d.getDate(),month=d.getMonth()+1,last=new Date(d.getFullYear(),month+1,0).getDate();
+  return new Date(d.getFullYear(),month,Math.min(day,last));
+ }
+ if(duration==="1 Tahun"){
+  const day=d.getDate(),month=d.getMonth(),last=new Date(d.getFullYear()+1,month+1,0).getDate();
+  return new Date(d.getFullYear()+1,month,Math.min(day,last));
+ }
+ const days=Number.parseInt(String(duration),10);
+ if(!Number.isFinite(days)||days<1)throw new Error("Durasi perpanjangan tidak valid.");
+ d.setDate(d.getDate()+days);
+ return d;
+}
+function fmtDateObj(d){return d.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})}
+function recordAccountType(r){return String(r.accountType||"").toLowerCase().includes("semi")?"Semi Private":"Sharing"}
+function openRenewalFlow(records){
+ const overlay=$("renewalOverlay"),host=$("renewalAccountCards");if(!overlay)return;
+ const all=getHistory();const ids=new Set((records||[]).map(r=>r.id));
+ const unique=all.filter(r=>ids.has(r.id));
+ if(!unique.length){alert("Belum ada data akun tersimpan untuk diperpanjang.");return}
+ host.innerHTML="";renewalAccount=null;renewalPackage=null;
+ unique.forEach((r,i)=>{
+  const exp=recordExpiryDate(r),today=dateOnly(new Date());
+  const days=exp?Math.round((dateOnly(exp)-today)/86400000):null;
+  const card=document.createElement("button");card.type="button";card.className="renewal-account-card";
+  const top=document.createElement("div");top.className="renewal-account-card-top";
+  const left=document.createElement("div");
+  const email=document.createElement("div");email.className="account-email";email.textContent=r.email||"Email tidak tersedia";
+  const id=document.createElement("div");id.className="account-id";
+  id.textContent=`ID Order: ${r.orderId||r.cloudId||r.id||"-"}`;
+  left.append(email,id);const tag=document.createElement("span");tag.className="reminder-tag";tag.textContent=days===null?"Tanggal tidak tersedia":days<0?`Berakhir ${Math.abs(days)} hari lalu`:days===0?"H-0":`H-${days}`;top.append(left,tag);
+  const meta=document.createElement("div");meta.className="account-meta";meta.textContent=`Jenis akun: ${recordAccountType(r)} · Profil: ${r.profile||"-"} · Perangkat: ${r.device||"Tidak disebutkan"} · Tanggal order: ${r.orderDate?fmtDate(r.orderDate):"-"}`;
+  const expiry=document.createElement("div");expiry.className="account-expiry";expiry.textContent=`Tanggal berakhir: ${exp?fmtDateObj(exp):r.expiry||"Tidak tersedia"}`;
+  const action=document.createElement("span");action.className="account-select-label";action.textContent="Pilih akun ini";
+  card.append(top,meta,expiry,action);
+  card.addEventListener("click",()=>{renewalAccount=r;renewalPackage=null;host.querySelectorAll(".renewal-account-card").forEach(x=>{x.classList.remove("selected");x.querySelector(".account-select-label").textContent="Pilih akun ini"});card.classList.add("selected");action.textContent="Akun dipilih ✓";$("renewalAccountNext").disabled=false});
+  host.appendChild(card);
+ });
+ $("renewalPackages").innerHTML="";$("renewalTotal").textContent="Pilih paket terlebih dahulu";
+ $("renewalAccountNext").disabled=true;$("renewalPackageNext").disabled=true;showRenewalStep(1);overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");
+}
+function showRenewalStep(step){
+ const ids=["renewalStepAccount","renewalStepPackage","renewalStepCheckout"];
+ ids.forEach((id,i)=>{const el=$(id);if(!el)return;el.hidden=(i+1)!==step;el.style.display=(i+1)===step?"block":"none"});
+ [1,2,3].forEach(i=>$("renewalProgress"+i)?.classList.toggle("active",i<=step));
+ $("renewalOverlay").querySelector(".renewal-dialog").scrollTop=0;
+}
+function renderRenewalAccount(){
+ const r=renewalAccount;if(!r)return;renewalPackage=null;
+ const exp=recordExpiryDate(r),info=$("renewalSelectedAccount");
+ const rows=[["ID Order",r.orderId||r.cloudId||r.id||"-"],["Email akun",r.email||"-"],["Jenis akun",recordAccountType(r)],["Profil",r.profile||"-"],["Perangkat",r.device||"-"],["Tanggal order",r.orderDate?fmtDate(r.orderDate):"-"],["Tanggal kedaluwarsa",exp?fmtDateObj(exp):r.expiry||"-"]];
+ info.innerHTML=rows.map(([a])=>`<div class="rrow"><span>${a}</span><strong></strong></div>`).join("");
+ info.querySelectorAll("strong").forEach((el,i)=>el.textContent=rows[i][1]);
+ $("renewalPackageSubtitle").textContent="Jenis akun: "+recordAccountType(r)+" · Hanya paket yang sesuai akun ini ditampilkan.";
+ const host=$("renewalPackages");host.innerHTML="";
+ RENEWAL_PRICES[recordAccountType(r)].forEach(([name,price,detail])=>{
+  const b=document.createElement("button");b.type="button";b.className="renewal-package";
+  b.innerHTML=`<strong>${name}</strong><div class="renewal-package-price">${rupiah(price)}</div><small>${detail}</small>`;
+  b.addEventListener("click",()=>{renewalPackage={name,price,detail};host.querySelectorAll("button").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");$("renewalTotal").textContent="Total pembayaran: "+rupiah(price);$("renewalPackageNext").disabled=false});
+  host.appendChild(b);
+ });
+ $("renewalTotal").textContent="Pilih paket terlebih dahulu";$("renewalPackageNext").disabled=true;
+}
+$("renewalAccountNext").onclick=()=>{if(!renewalAccount)return;renderRenewalAccount();showRenewalStep(2)};
+$("renewalPackageBack").onclick=()=>showRenewalStep(1);
+$("renewalPackageNext").onclick=()=>{if(!renewalAccount||!renewalPackage)return;openRenewalCheckout();showRenewalStep(3)};
+function renewalDates(){const exp=recordExpiryDate(renewalAccount);const today=dateOnly(new Date());const start=exp&&dateOnly(exp)>=today?dateOnly(exp):today;return {old:exp,start,newExpiry:addRenewalDuration(start,renewalPackage.name)}}
+function openRenewalCheckout(){
+ if(!renewalAccount||!renewalPackage)return;
+ const d=renewalDates();renewalNewExpiry=d.newExpiry;
+ const rows=[
+  ["ID Order",renewalAccount.orderId||renewalAccount.cloudId||renewalAccount.id||"-"],
+  ["Email akun",renewalAccount.email||"-"],
+  ["Jenis akun",recordAccountType(renewalAccount)],
+  ["Profil",renewalAccount.profile||"-"],
+  ["Perangkat",renewalAccount.device||"-"],
+  ["Tanggal order",renewalAccount.orderDate?fmtDate(renewalAccount.orderDate):"-"],
+  ["Paket perpanjangan",renewalPackage.name],
+  ["Harga",rupiah(renewalPackage.price)],
+  ["Kedaluwarsa lama",d.old?fmtDateObj(d.old):"Tidak tersedia"],
+  ["Mulai perhitungan",fmtDateObj(d.start)],
+  ["Kedaluwarsa baru",fmtDateObj(d.newExpiry)]
+ ];
+ $("renewalConfirmInfo").innerHTML=rows.map(([a,b])=>`<div class="rrow"><span>${a}</span><strong></strong></div>`).join("");
+ $("renewalConfirmInfo").querySelectorAll("strong").forEach((el,i)=>el.textContent=rows[i][1]);
+ $("renewalPayAmount").textContent=rupiah(renewalPackage.price);
+ showRenewalStep(3);
+}
+$("renewalCheckoutBack").onclick=()=>showRenewalStep(2);
+$("renewalSendAdmin").onclick=()=>{const r=renewalAccount,d=renewalDates();const text=`Halo Admin RAZH! Saya ingin mengajukan perpanjangan akun.\n\nDATA AKUN\nID Order: ${r.orderId||r.cloudId||r.id||"-"}\nEmail: ${r.email||"-"}\nJenis akun: ${r.accountType||"-"}\nDurasi sebelumnya: ${r.duration||"-"}\nTanggal order: ${fmtDate(r.orderDate)}\nTanggal login: ${fmtDate(r.loginDate)}\nJam login: ${r.loginTime||"-"} ${r.timezone||""}\nPerangkat: ${r.device||"-"}\nProfil: ${r.profile||"-"}\nWhatsApp pembeli: ${r.buyerWA||"-"}\n\nPENGAJUAN PERPANJANGAN\nPaket: ${renewalPackage.name}\nHarga: ${rupiah(renewalPackage.price)}\nKedaluwarsa lama: ${d.old?fmtDateObj(d.old):"-"}\nKedaluwarsa baru jika disetujui: ${fmtDateObj(d.newExpiry)}\n\nSaya akan melampirkan screenshot bukti pembayaran pada chat ini. Mohon periksa pembayaran dan konfirmasi sebelum masa aktif diperbarui. Terima kasih.`;window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(text)}`,"_blank","noopener")};
+
+const qrisImage=$("renewalQrisImage");
+if(qrisImage)qrisImage.addEventListener("error",()=>{
+ const note=document.createElement("div");note.className="renewal-note";
+ note.textContent="Gambar QRIS tidak ditemukan. Hubungi admin untuk meminta kode QRIS resmi sebelum membayar.";
+ qrisImage.replaceWith(note);
+});
+
+ $("renewalClose").onclick=()=>{$("renewalOverlay").classList.remove("show");$("renewalOverlay").setAttribute("aria-hidden","true")};
+$("renewalOverlay").addEventListener("click",e=>{if(e.target.id==="renewalOverlay")$("renewalClose").click()});
+
+updateLiveClock();setInterval(updateLiveClock,1000);
+renderHistory();showExpiryAlertIfNeeded();setInterval(renderReminders,60000);
+
+// Sistem pengingat lama yang membuat popup kedua di bawah halaman telah dihapus.
+
+function showReview(){
+ setPageHeading("Periksa data kamu", "Pastikan informasi sudah benar sebelum dikirim ke admin.");
+ $("wizard").classList.add("hidden");$("review").classList.remove("hidden");
+ $("progressLabel").textContent="PENGECEKAN DATA";$("progressCount").textContent="Selesai";$("progressBar").style.width="100%";
+ const rows=[
+ ["ID Order",data.cloudId||"-"],
+ ["Jenis akun",data.accountType],["Durasi",data.duration],["Email akun",emailValue()],
+ ["Tanggal order",fmtDate(data.orderDate)],["Tanggal habis",expiryText()],
+ ["Tanggal login",fmtDate(data.loginDate)],["Jam login",`${data.loginTime} ${data.loginTimezone==="Lainnya"?data.customTimezone:data.loginTimezone}`],["Device",data.device],
+ ["Profil",profileValue()],["Nomor WhatsApp",data.buyerWA||"Tidak diisi"]
+ ];
+ $("reviewList").innerHTML=rows.map(([k,v])=>`<div class="review-row"><span>${escapeHTML(k)}</span><strong>${escapeHTML(v)}</strong></div>`).join("");
+ message=createMessage();$("messagePreview").textContent=message;
+ // Setelah konten review dirender, arahkan pengguna ke tombol tindakan di bagian bawah.
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  window.scrollTo({top:Math.max(0,document.documentElement.scrollHeight-window.innerHeight),behavior:"smooth"});
+ }));
+ saveHistory();
+ if(data.cloudId){
+  const status=$("cloudSaveStatus");
+  status.textContent="Menyimpan data ke server...";
+  (async()=>{
+   try{
+    const deadline=Date.now()+10000;
+    while(typeof window.netflixCloudSave!=="function" && Date.now()<deadline){
+     await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    if(typeof window.netflixCloudSave!=="function"){
+     throw new Error("Koneksi penyimpanan belum siap. Periksa internet lalu muat ulang halaman.");
+    }
+    const expiry=calculateExpiry(data.orderDate);
+    const expiryDate=expiry?`${expiry.getFullYear()}-${String(expiry.getMonth()+1).padStart(2,"0")}-${String(expiry.getDate()).padStart(2,"0")}`:"";
+    await window.netflixCloudSave({
+     submissionId:data.cloudId,orderId:data.cloudId,accountType:data.accountType,duration:data.duration,
+     email:emailValue(),orderDate:data.orderDate,expiryDate,loginDate:data.loginDate,
+     loginTime:data.loginTime,timezone:data.loginTimezone==="Lainnya"?data.customTimezone:data.loginTimezone,
+     device:data.device,profile:profileValue(),buyerWA:data.buyerWA||""
+    });
+    status.textContent="✓ Data berhasil disimpan ke server. Silakan lanjutkan mengirim format ke admin.";
+    status.style.background="#f0fff5";status.style.borderColor="#b9e5c8";
+   }catch(err){
+    console.error("Firebase save failed:",err);
+    status.textContent="⚠ Data tersimpan di riwayat browser ini, tetapi belum berhasil dikirim ke server. Silakan kirim format melalui WhatsApp dan hubungi admin bila diperlukan.";
+    status.style.background="#fff8ed";status.style.borderColor="#f2d5a7";
+   }
+  })();
+ }
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function setPageHeading(title,subtitle){
+ $("pageTitle").textContent=title;
+ $("pageSubtitle").textContent=subtitle;
+ const onHome = title === "Pantau masa aktif paket" || title === "Pantau masa aktif Netflix";
+ $("globalBackWrap").classList.toggle("hidden", onHome);
+}
+setDashboardTab("home",false);
+document.querySelectorAll(".bottom-nav-item").forEach(btn=>btn.addEventListener("click",()=>{
+ if(btn.dataset.tab==="monitoring"){historyStatusFilter="all";if($("historySearch"))$("historySearch").value="";if($("historyTypeFilter"))$("historyTypeFilter").value="all";if($("historySort"))$("historySort").value="newest";renderHistory();}
+ setDashboardTab(btn.dataset.tab);
+}));
+document.querySelectorAll(".history-status-filter").forEach(btn=>btn.addEventListener("click",()=>{
+ historyStatusFilter=btn.dataset.statusFilter||"all";renderHistory();
+}));
+$("dashCreateBtn").addEventListener("click",()=>$("createMonitoringBtn").click());
+$("dashHistoryBtn").addEventListener("click",()=>{historyStatusFilter="all";renderHistory();setDashboardTab("monitoring");});
+$("dashboardSeeAllBtn").addEventListener("click",()=>{historyStatusFilter="all";renderHistory();setDashboardTab("monitoring");});
+$("moreReminderBtn").addEventListener("click",()=>setDashboardTab("reminder"));
+function openGuideCenter(){
+ $("homeDashboard").classList.add("hidden");
+ $("guideCenter").classList.remove("hidden");
+ $("bottomNav").classList.add("hidden");
+ $("globalBackWrap").classList.add("hidden");
+ $("pageTitle").textContent="Pusat Bantuan";
+ $("pageSubtitle").textContent="Panduan fitur dan solusi kendala RAZH Monitoring.";
+ $("guideSearch").value="";
+ filterGuideTopics();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function closeGuideCenter(){
+ $("guideCenter").classList.add("hidden");
+ $("homeDashboard").classList.remove("hidden");
+ $("bottomNav").classList.remove("hidden");
+ setDashboardTab("more");
+}
+function filterGuideTopics(){
+ const q=($("guideSearch").value||"").trim().toLowerCase();let count=0;
+ document.querySelectorAll(".guide-topic").forEach(topic=>{
+  const match=!q||topic.textContent.toLowerCase().includes(q);
+  topic.classList.toggle("hidden",!match);if(match)count++;
+  if(q&&match)topic.open=true;else if(!q)topic.open=false;
+ });
+ $("guideNoResults").classList.toggle("hidden",count>0);
+ $("guideCount").textContent=count+" topik";
+}
+$("moreGuideBtn").addEventListener("click",openGuideCenter);
+$("guideBackBtn").addEventListener("click",closeGuideCenter);
+$("guideSearch").addEventListener("input",filterGuideTopics);
+$("guideSearchClear").addEventListener("click",()=>{$("guideSearch").value="";filterGuideTopics();$("guideSearch").focus();});
+document.querySelectorAll("[data-guide-open]").forEach(btn=>btn.addEventListener("click",()=>{
+ const topic=document.querySelector('.guide-topic[data-topic="'+btn.dataset.guideOpen+'"]');
+ if(topic){topic.open=true;topic.scrollIntoView({behavior:"smooth",block:"start"});}
+}));
+$("guideStartForm").addEventListener("click",()=>{$("guideCenter").classList.add("hidden");$("bottomNav").classList.add("hidden");$("createMonitoringBtn").click();});
+$("guideContactAdmin").addEventListener("click",()=>{const msg="Halo Admin RAZH, saya membutuhkan bantuan penggunaan RAZH Monitoring.";window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank","noopener");});
+$("moreTermsBtn").addEventListener("click",()=>$("createMonitoringBtn").click());
+$("moreAdminBtn").addEventListener("click",()=>{const msg="Halo Admin RAZH, saya ingin bertanya mengenai layanan monitoring.";window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank","noopener");});
+$("globalBackBtn").addEventListener("click",()=>{
+ $("intro").classList.add("hidden");
+ $("wizard").classList.add("hidden");
+ $("review").classList.add("hidden");
+ $("progressWrap").classList.add("hidden");
+ $("homeDashboard").classList.remove("hidden");
+ showDashboard();
+ $("introError").style.display="none";
+ $("errorBox").style.display="none";
+ $("sendError").style.display="none";
+ index = 0;
+ setPageHeading("Pantau masa aktif paket", "Layanan monitoring independen milik seller untuk mencatat pesanan dan memantau masa aktif paket.");
+ window.scrollTo({top:0,behavior:"smooth"});
+});
+$("createMonitoringBtn").addEventListener("click",()=>{
+ data.accountType="";data.duration="";data.customDurationDays="";data.email="";data.customEmail="";
+ data.orderDate=todayISO();data.loginDate=todayISO();data.loginTime="";
+ data.loginTimezone="WIB";data.customTimezone="";data.device="";
+ data.profile="";data.customProfile="";data.buyerWA="";
+ data.cloudId = generateOrderId();
+ index=0;
+ $("agreeIntro").checked=false;
+ $("homeDashboard").classList.add("hidden");
+ hideDashboardNavigation();
+ $("intro").classList.remove("hidden");
+ setPageHeading("Sebelum mulai", "Baca keterangan dan ketentuan pengisian data terlebih dahulu.");
+ // Setelah halaman persetujuan tampil, arahkan pengguna ke bagian paling bawah
+ // agar checkbox dan tombol "Saya Mengerti, Mulai Isi Form" langsung terlihat.
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  window.scrollTo({
+   top:Math.max(0,document.documentElement.scrollHeight-window.innerHeight),
+   behavior:"smooth"
+  });
+ }));
+});
+$("introHomeBtn").addEventListener("click",()=>{
+ $("intro").classList.add("hidden");
+ $("wizard").classList.add("hidden");
+ $("review").classList.add("hidden");
+ $("progressWrap").classList.add("hidden");
+ $("homeDashboard").classList.remove("hidden");
+ showDashboard();
+ $("introError").style.display="none";
+ setPageHeading("Pantau masa aktif paket", "Layanan monitoring independen milik seller untuk mencatat pesanan dan memantau masa aktif paket.");
+ window.scrollTo({top:0,behavior:"smooth"});
+});
+$("startBtn").addEventListener("click",()=>{
+ if(!$("agreeIntro").checked){
+  $("introError").textContent="Centang persetujuan setelah membaca keterangan untuk melanjutkan.";
+  $("introError").style.display="block";
+  return;
+ }
+ $("intro").classList.add("hidden");
+ $("homeDashboard").classList.add("hidden");
+ hideDashboardNavigation();
+ setPageHeading("Isi data monitoring", "Isi satu per satu. Setelah semua lengkap, periksa kembali sebelum mengirim ke admin.");
+ $("progressWrap").classList.remove("hidden");
+ $("wizard").classList.remove("hidden");
+ renderStep();
+ window.scrollTo({top:0,behavior:"smooth"});
+});
+$("nextBtn").addEventListener("click",advance);
+$("backBtn").addEventListener("click",()=>{if(index>0){index--;renderStep()}});
+$("editBtn").addEventListener("click",()=>{setPageHeading("Isi data monitoring", "Periksa dan ubah data yang diperlukan.");$("review").classList.add("hidden");$("wizard").classList.remove("hidden");index=0;renderStep()});
+$("copyBtn").addEventListener("click",async()=>{
+ const btn=$("copyBtn"),manual=$("manualCopyWrap"),textArea=$("manualCopyText");
+ try{
+  if(navigator.clipboard && window.isSecureContext){
+   await navigator.clipboard.writeText(message);
+   btn.textContent="Berhasil disalin ✓";
+   manual.classList.add("hidden");
+   setTimeout(()=>btn.textContent="Salin format",1800);
+   return;
+  }
+  throw new Error("Clipboard API tidak tersedia");
+ }catch(e){
+  // Fallback yang ramah Android: tampilkan textarea yang bisa dipilih secara manual.
+  textArea.value=message;
+  manual.classList.remove("hidden");
+  textArea.focus();
+  textArea.select();
+  textArea.setSelectionRange(0,textArea.value.length);
+  btn.textContent="Pilih teks di bawah";
+  $("sendError").textContent="Salin otomatis dibatasi oleh browser. Teks sudah disiapkan di kolom bawah—tekan lama, pilih semua, lalu Salin.";
+  $("sendError").style.display="block";
+  manual.scrollIntoView({behavior:"smooth",block:"center"});
+ }
+});
+$("sendBtn").addEventListener("click",()=>{
+ const err=$("sendError");err.style.display="none";
+ if(!ADMIN_WHATSAPP||ADMIN_WHATSAPP.includes("GANTI")){
+  err.textContent="Nomor WhatsApp admin belum dipasang oleh seller. Kamu masih bisa menyalin format di bawah ini dan mengirimkannya secara manual.";err.style.display="block";return;
+ }
+ const number=ADMIN_WHATSAPP.replace(/\D/g,"");
+ window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`,"_blank","noopener");
+});
+// Form dimulai setelah buyer membaca dan menyetujui keterangan awal.
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBVrE2a5o_APc3z9DryjVg2JFBnPLLzW_o",
+  authDomain: "netflix-monitoring.firebaseapp.com",
+  projectId: "netflix-monitoring",
+  storageBucket: "netflix-monitoring.firebasestorage.app",
+  messagingSenderId: "14138899326",
+  appId: "1:14138899326:web:c1377d6e32b1e66c11912f",
+  measurementId: "G-QQF5KPMQVC"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+let currentUser = null;
+const authReady = signInAnonymously(auth).then((credential) => {
+  currentUser = credential.user;
+  return currentUser;
+}).catch((error) => {
+  console.error("Firebase anonymous sign-in failed:", error);
+  throw error;
+});
+window.netflixCloudSaveReady = authReady;
+
+window.netflixCloudSave = async (payload) => {
+  await authReady;
+  if (!currentUser) throw new Error("Autentikasi Firebase belum siap.");
+  const orderRef = doc(db, "monitoringOrders", currentUser.uid + "_" + payload.submissionId);
+  await setDoc(orderRef, {
+    uid: currentUser.uid,
+    orderId: payload.orderId || payload.submissionId,
+    submissionId: payload.submissionId,
+    accountType: payload.accountType,
+    duration: payload.duration,
+    email: payload.email,
+    orderDate: payload.orderDate,
+    expiryDate: payload.expiryDate,
+    loginDate: payload.loginDate,
+    loginTime: payload.loginTime,
+    timezone: payload.timezone,
+    device: payload.device,
+    profile: payload.profile,
+    buyerWA: payload.buyerWA,
+    createdAt: serverTimestamp()
+  });
+  return true;
+};
+
+// Notifikasi latar belakang dihapus. Pengingat ditampilkan saat halaman dibuka.
+
+</script>
+
+
+<script>
+(function(){
+ const splash=document.getElementById('razhSplash');
+ if(!splash) return;
+ const reduceMotion=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const logoDuration=2100;
+ const exitDuration=350;
+ window.setTimeout(()=>{
+  splash.classList.add('razh-leave');
+  window.setTimeout(()=>{
+   splash.remove();
+   document.body.classList.add('razh-enter');
+  },exitDuration);
+ },logoDuration);
+})();
+</script>
+
+</body>
+</html>
